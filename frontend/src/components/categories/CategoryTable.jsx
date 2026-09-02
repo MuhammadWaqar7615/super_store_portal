@@ -18,7 +18,7 @@ const CategoryTable = ({ categories, onEdit, onDelete }) => {
               <td className="px-6 py-4 text-sm text-gray-400">{category.description || '-'}</td>
               <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                 <button onClick={() => onEdit(category)} className="text-blue-400 hover:text-blue-300 mr-4 transition-colors">Edit</button>
-                <button onClick={() => onDelete(category._id)} className="text-[#E8446A] hover:text-pink-400 transition-colors">Delete</button>
+                <button onClick={() => onDelete(category._id)} className="text-[#10b981] hover:text-pink-400 transition-colors">Delete</button>
               </td>
             </tr>
           ))}

@@ -61,9 +61,9 @@ const POSCustomerSelect = ({ selectedCustomer, setSelectedCustomer }) => {
   };
 
   return (
-    <div className="bg-white rounded-[8px] border border-slate-200 shadow-[0_1px_3px_rgba(0,0,0,0.06)] overflow-hidden">
-      <div className="p-4 border-b border-slate-200 bg-slate-50 flex justify-between items-center">
-        <h3 className="text-slate-800 font-semibold text-[16px] flex items-center">
+    <div className="bg-transparent overflow-hidden">
+      <div className="p-4 border-b border-white/20 bg-transparent flex justify-between items-center">
+        <h3 className="text-white font-semibold text-[16px] flex items-center">
           <User className="w-5 h-5 mr-2 text-blue-600" />
           Customer
         </h3>
@@ -71,7 +71,7 @@ const POSCustomerSelect = ({ selectedCustomer, setSelectedCustomer }) => {
         {selectedCustomer ? (
           <button 
             onClick={() => setSelectedCustomer(null)} 
-            className="text-[12px] font-medium text-slate-500 hover:text-red-600 transition-colors flex items-center"
+            className="text-[12px] font-medium text-gray-300 hover:text-red-600 transition-colors flex items-center"
           >
             <X className="w-3 h-3 mr-1" /> Clear
           </button>
@@ -87,28 +87,28 @@ const POSCustomerSelect = ({ selectedCustomer, setSelectedCustomer }) => {
 
       <div className="p-4">
         {selectedCustomer ? (
-          <div className="bg-slate-50 border border-slate-200 rounded-[8px] p-3 flex items-start">
+          <div className="bg-transparent border border-white/20 rounded-[8px] p-3 flex items-start">
             <div className="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold mr-3 shrink-0">
               {selectedCustomer.name.charAt(0).toUpperCase()}
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center justify-between mb-1">
-                <p className="text-slate-800 font-bold text-[14px] truncate">{selectedCustomer.name}</p>
+                <p className="text-white font-bold text-[14px] truncate">{selectedCustomer.name}</p>
                 <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-sm uppercase tracking-wider ${
                   selectedCustomer.isRegistered 
                     ? 'bg-green-100 text-green-700' 
-                    : selectedCustomer._id ? 'bg-slate-200 text-slate-600' : 'bg-amber-100 text-amber-700'
+                    : selectedCustomer._id ? 'bg-white/10 text-gray-200' : 'bg-amber-100 text-amber-700'
                 }`}>
                   {selectedCustomer.isRegistered ? 'Registered' : selectedCustomer._id ? 'Walk-in' : 'Guest'}
                 </span>
               </div>
               {selectedCustomer.phone && (
-                <p className="text-slate-500 text-[12px] flex items-center mt-1">
+                <p className="text-gray-300 text-[12px] flex items-center mt-1">
                   <Phone className="w-3 h-3 mr-1" /> {selectedCustomer.phone}
                 </p>
               )}
               {selectedCustomer.email && (
-                <p className="text-slate-500 text-[12px] flex items-center mt-0.5 truncate">
+                <p className="text-gray-300 text-[12px] flex items-center mt-0.5 truncate">
                   <Mail className="w-3 h-3 mr-1" /> {selectedCustomer.email}
                 </p>
               )}
@@ -119,7 +119,7 @@ const POSCustomerSelect = ({ selectedCustomer, setSelectedCustomer }) => {
             <div className="relative">
               <input
                 type="text"
-                className="w-full bg-white border border-slate-200 rounded-[8px] pl-9 pr-4 py-2.5 text-slate-800 text-[14px] placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all shadow-sm"
+                className="w-full bg-white/10 backdrop-blur-md border border-white/20 rounded-[8px] pl-9 pr-4 py-2.5 text-white text-[14px] placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all shadow-sm"
                 placeholder="Search by name, phone, email..."
                 value={search}
                 onChange={(e) => {
@@ -128,16 +128,16 @@ const POSCustomerSelect = ({ selectedCustomer, setSelectedCustomer }) => {
                 }}
                 onFocus={() => setShowDropdown(true)}
               />
-              <Search className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+              <Search className="w-4 h-4 text-gray-400 absolute left-3 top-3" />
             </div>
             
             {showDropdown && search && (
-              <div className="absolute top-full mt-1 w-full bg-white border border-slate-200 rounded-[8px] shadow-lg max-h-60 overflow-y-auto z-20">
+              <div className="absolute top-full mt-1 w-full bg-white/10 backdrop-blur-md border border-white/20 rounded-[8px] shadow-lg max-h-60 overflow-y-auto z-20">
                 <ul className="py-1">
                   {filtered.map(c => (
                     <li
                       key={c._id}
-                      className="px-4 py-2 hover:bg-slate-50 text-slate-800 cursor-pointer border-b border-slate-100 last:border-0"
+                      className="px-4 py-2 hover:bg-transparent text-white cursor-pointer border-b border-slate-100 last:border-0"
                       onClick={() => { 
                         setSelectedCustomer(c); 
                         setSearch(''); 
@@ -150,14 +150,14 @@ const POSCustomerSelect = ({ selectedCustomer, setSelectedCustomer }) => {
                           <span className="text-[10px] font-bold px-1.5 py-0.5 bg-green-100 text-green-700 rounded-sm">REG</span>
                         )}
                       </div>
-                      <div className="flex justify-between items-center text-[12px] text-slate-500">
+                      <div className="flex justify-between items-center text-[12px] text-gray-300">
                         <span>{c.phone}</span>
                         <span className="truncate ml-2">{c.email}</span>
                       </div>
                     </li>
                   ))}
                   {filtered.length === 0 && (
-                    <li className="px-4 py-3 text-slate-500 text-[14px] text-center bg-slate-50">
+                    <li className="px-4 py-3 text-gray-300 text-[14px] text-center bg-transparent">
                       No matching customers found.
                       <button 
                         onClick={() => {
@@ -190,42 +190,42 @@ const POSCustomerSelect = ({ selectedCustomer, setSelectedCustomer }) => {
       {/* Quick Add Modal */}
       {showAddModal && (
         <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-[8px] shadow-xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95">
-            <div className="px-6 py-4 border-b border-slate-200 flex justify-between items-center bg-slate-50">
-              <h2 className="text-[18px] font-bold text-slate-800">Quick Add Walk-in</h2>
-              <button onClick={() => setShowAddModal(false)} className="text-slate-400 hover:text-slate-600">
+          <div className="bg-white/10 backdrop-blur-md rounded-[8px] shadow-xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95">
+            <div className="px-6 py-4 border-b border-white/20 flex justify-between items-center bg-transparent">
+              <h2 className="text-[18px] font-bold text-white">Quick Add Walk-in</h2>
+              <button onClick={() => setShowAddModal(false)} className="text-gray-400 hover:text-gray-200">
                 <X className="w-5 h-5" />
               </button>
             </div>
             
             <form onSubmit={handleQuickAdd} className="p-6">
               {addError && (
-                <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-600 text-[14px] rounded-[4px]">
+                <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 text-red-600 text-[14px] rounded-[4px]">
                   {addError}
                 </div>
               )}
               
               <div className="space-y-4">
                 <div>
-                  <label className="block text-[14px] font-medium text-slate-700 mb-1">Full Name *</label>
+                  <label className="block text-[14px] font-medium text-gray-100 mb-1">Full Name *</label>
                   <input
                     type="text"
                     required
                     maxLength={50}
-                    className="w-full bg-white border border-slate-300 rounded-[4px] px-3 py-2 text-[14px] text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
+                    className="w-full bg-white/10 backdrop-blur-md border border-white/30 rounded-[4px] px-3 py-2 text-[14px] text-white focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
                     value={newCustomer.name}
                     onChange={(e) => setNewCustomer({...newCustomer, name: e.target.value})}
                   />
                 </div>
                 
                 <div>
-                  <label className="block text-[14px] font-medium text-slate-700 mb-1">Phone Number *</label>
+                  <label className="block text-[14px] font-medium text-gray-100 mb-1">Phone Number *</label>
                   <input
                     type="text"
                     required
                     maxLength={11}
                     placeholder="e.g. 03001234567"
-                    className="w-full bg-white border border-slate-300 rounded-[4px] px-3 py-2 text-[14px] text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
+                    className="w-full bg-white/10 backdrop-blur-md border border-white/30 rounded-[4px] px-3 py-2 text-[14px] text-white focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
                     value={newCustomer.phone}
                     onChange={(e) => {
                       // Only allow digits to be typed
@@ -233,15 +233,15 @@ const POSCustomerSelect = ({ selectedCustomer, setSelectedCustomer }) => {
                       setNewCustomer({...newCustomer, phone: val});
                     }}
                   />
-                  <p className="text-[12px] text-slate-500 mt-1">Exactly 11 digits.</p>
+                  <p className="text-[12px] text-gray-300 mt-1">Exactly 11 digits.</p>
                 </div>
                 
                 <div>
-                  <label className="block text-[14px] font-medium text-slate-700 mb-1">Email (Optional)</label>
+                  <label className="block text-[14px] font-medium text-gray-100 mb-1">Email (Optional)</label>
                   <input
                     type="email"
                     maxLength={100}
-                    className="w-full bg-white border border-slate-300 rounded-[4px] px-3 py-2 text-[14px] text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
+                    className="w-full bg-white/10 backdrop-blur-md border border-white/30 rounded-[4px] px-3 py-2 text-[14px] text-white focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
                     value={newCustomer.email}
                     onChange={(e) => setNewCustomer({...newCustomer, email: e.target.value})}
                   />
@@ -252,7 +252,7 @@ const POSCustomerSelect = ({ selectedCustomer, setSelectedCustomer }) => {
                 <button
                   type="button"
                   onClick={() => setShowAddModal(false)}
-                  className="px-4 py-2 border border-slate-300 rounded-[4px] text-slate-700 text-[14px] font-medium hover:bg-slate-50 transition-colors"
+                  className="px-4 py-2 border border-white/30 rounded-[4px] text-gray-100 text-[14px] font-medium hover:bg-transparent transition-colors"
                 >
                   Cancel
                 </button>

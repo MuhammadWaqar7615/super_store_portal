@@ -24,7 +24,7 @@ const RecentSales = ({ sales }) => {
                 </p>
               </div>
               <div className="text-right">
-                <p className="text-[#E8446A] font-bold">Rs. {sale.total.toLocaleString()}</p>
+                <p className="text-[#10b981] font-bold">Rs. {sale.total.toLocaleString()}</p>
                 <span className={`text-[10px] px-2 py-1 rounded-full uppercase tracking-wider ${sale.status === 'completed' ? 'bg-green-500/20 text-green-300' : 'bg-yellow-500/20 text-yellow-300'}`}>
                   {sale.status}
                 </span>

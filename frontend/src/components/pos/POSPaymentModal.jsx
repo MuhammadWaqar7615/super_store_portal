@@ -54,17 +54,17 @@ const CheckoutForm = ({ amount, onPaymentSuccess }) => {
     return (
       <div className="flex flex-col items-center justify-center py-8">
         <CheckCircle className="w-16 h-16 text-green-600 mb-4 animate-in zoom-in" />
-        <h3 className="text-xl font-bold text-slate-800 mb-1">Payment Successful!</h3>
-        <p className="text-slate-500">Generating receipt...</p>
+        <h3 className="text-xl font-bold text-white mb-1">Payment Successful!</h3>
+        <p className="text-gray-300">Generating receipt...</p>
       </div>
     );
   }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="bg-slate-50 border border-slate-200 p-4 rounded-[8px]">
-        <label className="block text-[14px] font-medium text-slate-700 mb-2">Card Details</label>
-        <div className="bg-white p-3 border border-slate-300 rounded-[4px] shadow-sm">
+      <div className="bg-transparent border border-white/20 p-4 rounded-[8px]">
+        <label className="block text-[14px] font-medium text-gray-100 mb-2">Card Details</label>
+        <div className="bg-white/10 backdrop-blur-md p-3 border border-white/30 rounded-[4px] shadow-sm">
           <CardElement options={{
             style: {
               base: { fontSize: '16px', color: '#1e293b', '::placeholder': { color: '#94a3b8' } },
@@ -75,7 +75,7 @@ const CheckoutForm = ({ amount, onPaymentSuccess }) => {
       </div>
       
       {error && (
-        <div className="p-3 bg-red-50 border border-red-200 rounded-[4px] flex items-start">
+        <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-[4px] flex items-start">
           <AlertCircle className="w-5 h-5 text-red-600 mr-2 shrink-0 mt-0.5" />
           <p className="text-red-700 text-[14px]">{error}</p>
         </div>
@@ -163,41 +163,41 @@ const POSPaymentModal = ({ isOpen, onClose, amount, cart, customer, onSuccess })
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
-      <div className="bg-white border border-slate-200 rounded-[12px] w-full max-w-md shadow-2xl relative overflow-hidden animate-in fade-in zoom-in-95">
-        <div className="px-6 py-4 border-b border-slate-200 flex justify-between items-center bg-slate-50">
-          <h2 className="text-[18px] font-bold text-slate-800">Complete Payment</h2>
-          <button onClick={onClose} className="text-slate-400 hover:text-slate-600 transition-colors">
+      <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-[12px] w-full max-w-md shadow-2xl relative overflow-hidden animate-in fade-in zoom-in-95">
+        <div className="px-6 py-4 border-b border-white/20 flex justify-between items-center bg-transparent">
+          <h2 className="text-[18px] font-bold text-white">Complete Payment</h2>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-200 transition-colors">
             <X className="w-5 h-5" />
           </button>
         </div>
 
         <div className="p-6">
-          <div className="mb-6 flex flex-col items-center justify-center py-4 bg-slate-50 border border-slate-200 rounded-[8px]">
-            <span className="text-slate-500 text-[14px] font-medium uppercase tracking-wider mb-1">Total to Pay</span>
-            <span className="text-[32px] font-extrabold text-slate-800">
-              <span className="text-[20px] text-slate-500 mr-1">Rs.</span>
+          <div className="mb-6 flex flex-col items-center justify-center py-4 bg-transparent border border-white/20 rounded-[8px]">
+            <span className="text-gray-300 text-[14px] font-medium uppercase tracking-wider mb-1">Total to Pay</span>
+            <span className="text-[32px] font-extrabold text-white">
+              <span className="text-[20px] text-gray-300 mr-1">Rs.</span>
               {amount.toLocaleString()}
             </span>
           </div>
 
-          <div className="mb-6 flex items-center justify-between p-3 bg-blue-50 border border-blue-100 rounded-[8px]">
+          <div className="mb-6 flex items-center justify-between p-3 bg-[#10b981]/20 border border-[#10b981]/30 rounded-[8px]">
             <div className="flex flex-col">
               <span className="text-[12px] text-blue-600 font-semibold uppercase tracking-wide">Customer</span>
-              <span className="text-[14px] font-bold text-slate-800">
+              <span className="text-[14px] font-bold text-white">
                 {customer?.name || 'Walk-in Customer'}
               </span>
             </div>
             {customer?.phone && (
-              <span className="text-[14px] text-slate-600">{customer.phone}</span>
+              <span className="text-[14px] text-gray-200">{customer.phone}</span>
             )}
           </div>
 
           <div className="mb-6">
-            <div className="flex bg-slate-100 p-1 rounded-lg w-full mb-4">
+            <div className="flex bg-white/5 p-1 rounded-lg w-full mb-4">
               <button
                 onClick={() => setPaymentMethod('card')}
                 className={`flex-1 flex justify-center items-center py-2 rounded-md text-[14px] font-medium transition-colors ${
-                  paymentMethod === 'card' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200'
+                  paymentMethod === 'card' ? 'bg-white/10 backdrop-blur-md text-blue-600 shadow-sm' : 'text-gray-300 hover:text-gray-100 hover:bg-white/10'
                 }`}
               >
                 Card (Stripe)
@@ -205,7 +205,7 @@ const POSPaymentModal = ({ isOpen, onClose, amount, cart, customer, onSuccess })
               <button
                 onClick={() => setPaymentMethod('cash')}
                 className={`flex-1 flex justify-center items-center py-2 rounded-md text-[14px] font-medium transition-colors ${
-                  paymentMethod === 'cash' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200'
+                  paymentMethod === 'cash' ? 'bg-white/10 backdrop-blur-md text-blue-600 shadow-sm' : 'text-gray-300 hover:text-gray-100 hover:bg-white/10'
                 }`}
               >
                 Cash

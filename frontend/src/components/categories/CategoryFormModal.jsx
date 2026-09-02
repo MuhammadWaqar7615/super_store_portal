@@ -38,9 +38,9 @@ const CategoryFormModal = ({ isOpen, onClose, onSuccess, categoryToEdit }) => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-      <div className="bg-[#1B2A4A] border border-white/20 rounded-3xl p-8 w-full max-w-md shadow-2xl relative overflow-hidden">
+      <div className="bg-[#064e3b] border border-white/20 rounded-3xl p-8 w-full max-w-md shadow-2xl relative overflow-hidden">
         {/* Decorative glow */}
-        <div className="absolute -top-20 -right-20 w-40 h-40 bg-[#E8446A] rounded-full blur-[80px] opacity-20"></div>
+        <div className="absolute -top-20 -right-20 w-40 h-40 bg-[#10b981] rounded-full blur-[80px] opacity-20"></div>
         
         <h2 className="text-2xl font-bold text-white mb-6 relative z-10">
           {categoryToEdit ? 'Edit Category' : 'Add Category'}
@@ -54,7 +54,7 @@ const CategoryFormModal = ({ isOpen, onClose, onSuccess, categoryToEdit }) => {
             <input
               type="text"
               required
-              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#E8446A]/50 focus:border-transparent transition-all"
+              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#10b981]/50 focus:border-transparent transition-all"
               placeholder="e.g. Beverages"
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
@@ -64,7 +64,7 @@ const CategoryFormModal = ({ isOpen, onClose, onSuccess, categoryToEdit }) => {
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-1">Description</label>
             <textarea
-              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#E8446A]/50 focus:border-transparent transition-all min-h-[100px]"
+              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#10b981]/50 focus:border-transparent transition-all min-h-[100px]"
               placeholder="Optional description"
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
@@ -82,7 +82,7 @@ const CategoryFormModal = ({ isOpen, onClose, onSuccess, categoryToEdit }) => {
             <button
               type="submit"
               disabled={loading}
-              className="px-5 py-2.5 rounded-xl bg-[#E8446A] hover:bg-[#d4375b] text-white transition-all font-medium shadow-[0_0_15px_rgba(232,68,106,0.4)] disabled:opacity-50"
+              className="px-5 py-2.5 rounded-xl bg-[#10b981] hover:bg-[#059669] text-white transition-all font-medium shadow-[0_0_15px_rgba(16,185,129,0.4)] disabled:opacity-50"
             >
               {loading ? 'Saving...' : 'Save Category'}
             </button>

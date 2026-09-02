@@ -1,22 +1,99 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
 @import "tailwindcss";
 
 @theme {
-  --color-primary: #2563eb;
-  --color-success: #16a34a;
+  /* Sea Green (mapped to blue and green for standard utilities) */
+  --color-blue-50: #f0fdf4;
+  --color-blue-100: #dcfce7;
+  --color-blue-200: #bbf7d0;
+  --color-blue-300: #86efac;
+  --color-blue-400: #4ade80;
+  --color-blue-500: #22c55e;
+  --color-blue-600: #10b981; /* Sea Green (Emerald 500) */
+  --color-blue-700: #059669;
+  --color-blue-800: #047857;
+  --color-blue-900: #065f46;
+  
+  --color-green-50: #f0fdf4;
+  --color-green-100: #dcfce7;
+  --color-green-200: #bbf7d0;
+  --color-green-300: #86efac;
+  --color-green-400: #4ade80;
+  --color-green-500: #22c55e;
+  --color-green-600: #10b981; /* Sea Green (Emerald 500) */
+  --color-green-700: #059669;
+  --color-green-800: #047857;
+  --color-green-900: #065f46;
+  
+  /* Black / Dark Gray (mapped to slate for login page bg, etc.) */
+  --color-slate-50: #fafafa;
+  --color-slate-100: #f4f4f5;
+  --color-slate-200: #e4e4e7;
+  --color-slate-300: #d4d4d8;
+  --color-slate-400: #a1a1aa;
+  --color-slate-500: #71717a;
+  --color-slate-600: #52525b;
+  --color-slate-700: #3f3f46;
+  --color-slate-800: #111111; /* Near black */
+  --color-slate-900: #000000; /* Pure black for Login */
+  
+  --color-gray-50: #fafafa;
+  --color-gray-100: #f4f4f5;
+  --color-gray-200: #e4e4e7;
+  --color-gray-300: #d4d4d8;
+  --color-gray-400: #a1a1aa;
+  --color-gray-500: #71717a;
+  --color-gray-600: #52525b;
+  --color-gray-700: #3f3f46;
+  --color-gray-800: #111111; 
+  --color-gray-900: #000000;
+
+  /* Red (mapped to a vibrant but professional red for errors) */
+  --color-red-50: #fef2f2;
+  --color-red-100: #fee2e2;
+  --color-red-200: #fecaca;
+  --color-red-300: #fca5a5;
+  --color-red-400: #f87171;
+  --color-red-500: #ef4444;
+  --color-red-600: #dc2626;
+  --color-red-700: #b91c1c;
+
+  --font-sans: "Outfit", system-ui, -apple-system, sans-serif;
+  
+  /* Standard project variables */
+  --color-primary: var(--color-blue-600);
+  --color-success: var(--color-green-600);
   --color-warning: #f59e0b;
-  --color-danger: #dc2626;
+  --color-danger: var(--color-red-600);
 }
 
 :root {
-  font-family: Inter, system-ui, -apple-system, sans-serif;
-  line-height: 1.5;
+  font-family: "Outfit", system-ui, -apple-system, sans-serif;
+  line-height: 1.6;
   font-weight: 400;
+  -webkit-font-smoothing: antialiased;
 }
 
 body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
-  background-color: #f8fafc; /* slate-50 */
-  color: #1e293b; /* slate-800 */
+  background-color: #f4f4f5; /* Light gray for pages like layout background */
+  color: #111111; 
+}
+
+/* Custom Scrollbars to match the black and sea green theme */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #f4f4f5;
+}
+::-webkit-scrollbar-thumb {
+  background: #10b981; /* Sea green scrollbar thumb */
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #059669; /* Darker sea green on hover */
 }

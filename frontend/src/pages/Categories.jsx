@@ -48,7 +48,7 @@ const Categories = () => {
   };
 
   return (
-    <div className="min-h-[calc(100vh-64px)] bg-[#1B2A4A] p-8 -m-6" style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}>
+    <div className="min-h-[100vh] bg-[#064e3b] p-8 -m-6" style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}>
       <div className="flex justify-between items-center mb-8">
         <div>
           <h1 className="text-4xl font-extrabold text-white tracking-tight">Categories</h1>
@@ -56,7 +56,7 @@ const Categories = () => {
         </div>
         <button 
           onClick={openAddModal}
-          className="bg-[#E8446A] hover:bg-[#d4375b] text-white px-6 py-3 rounded-xl shadow-[0_0_15px_rgba(232,68,106,0.4)] transition-all font-medium flex items-center"
+          className="bg-[#10b981] hover:bg-[#059669] text-white px-6 py-3 rounded-xl shadow-[0_0_15px_rgba(16,185,129,0.4)] transition-all font-medium flex items-center"
         >
           <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4"></path></svg>
           Add Category

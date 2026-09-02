@@ -42,10 +42,10 @@ const AppRoutes = () => {
       <Route path="/admin" element={<Navigate to="/dashboard" replace />} />
 
       {/* Unauthorized Fallback */}
-      <Route path="/unauthorized" element={<div className="flex h-screen items-center justify-center text-2xl text-white bg-[#1B2A4A]">Unauthorized Access</div>} />
+      <Route path="/unauthorized" element={<div className="flex h-screen items-center justify-center text-2xl text-white bg-[#064e3b]">Unauthorized Access</div>} />
 
       {/* Catch-all 404 Route */}
-      <Route path="*" element={<div className="flex h-screen items-center justify-center text-2xl text-white bg-[#1B2A4A]">404 - Page Not Found</div>} />
+      <Route path="*" element={<div className="flex h-screen items-center justify-center text-2xl text-white bg-[#064e3b]">404 - Page Not Found</div>} />
     </Routes>
   );
 };

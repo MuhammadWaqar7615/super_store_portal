@@ -34,7 +34,7 @@ const ProductTable = ({ products, onEdit, onDelete, onToggleActive }) => {
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-400">{product.category?.name || 'N/A'}</td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-400">{product.sellingPrice}</td>
               <td className="px-6 py-4 whitespace-nowrap">
-                <span className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${product.stockQuantity > product.minimumStock ? 'bg-green-500/20 text-green-300 border border-green-500/30' : 'bg-[#E8446A]/20 text-[#E8446A] border border-[#E8446A]/30 shadow-[0_0_10px_rgba(232,68,106,0.3)]'}`}>
+                <span className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${product.stockQuantity > product.minimumStock ? 'bg-green-500/20 text-green-300 border border-green-500/30' : 'bg-[#10b981]/20 text-[#10b981] border border-[#10b981]/30 shadow-[0_0_10px_rgba(16,185,129,0.3)]'}`}>
                   {product.stockQuantity} {product.unit}
                 </span>
               </td>
@@ -48,7 +48,7 @@ const ProductTable = ({ products, onEdit, onDelete, onToggleActive }) => {
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                 <button onClick={() => onEdit(product)} className="text-blue-400 hover:text-blue-300 mr-4 transition-colors">Edit</button>
-                <button onClick={() => onDelete(product._id)} className="text-[#E8446A] hover:text-pink-400 transition-colors">Delete</button>
+                <button onClick={() => onDelete(product._id)} className="text-[#10b981] hover:text-pink-400 transition-colors">Delete</button>
               </td>
             </tr>
           ))}

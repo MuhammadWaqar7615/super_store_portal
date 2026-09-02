@@ -32,7 +32,7 @@ const Login = () => {
     <div className="min-h-screen bg-slate-900 flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 font-sans">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <h2 className="mt-6 text-center text-3xl font-extrabold text-white tracking-tight">
-          ERP System
+          Super Store Portal
         </h2>
         <p className="mt-2 text-center text-sm text-slate-400">
           Admin & Cashier Portal
@@ -78,7 +78,7 @@ const Login = () => {
               disabled={loading}
               className="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-lg shadow-sm text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 focus:ring-offset-slate-900 transition-all disabled:opacity-50 disabled:cursor-not-allowed mt-2"
             >
-              {loading ? 'Authenticating...' : 'Sign in to ERP'}
+              {loading ? 'Authenticating...' : 'Sign in to Portal'}
             </button>
           </form>
 

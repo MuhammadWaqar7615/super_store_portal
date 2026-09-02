@@ -43,7 +43,7 @@ const StockAdjustmentModal = ({ isOpen, onClose, onSuccess, product }) => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-      <div className="bg-[#1B2A4A] border border-white/20 rounded-3xl p-8 w-full max-w-md shadow-2xl relative overflow-hidden">
+      <div className="bg-[#064e3b] border border-white/20 rounded-3xl p-8 w-full max-w-md shadow-2xl relative overflow-hidden">
         <h2 className="text-2xl font-bold text-white mb-2 relative z-10">Adjust Stock</h2>
         <p className="text-gray-400 mb-6 text-sm">{product.name}</p>
         
@@ -69,7 +69,7 @@ const StockAdjustmentModal = ({ isOpen, onClose, onSuccess, product }) => {
             <input
               type="number"
               required
-              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-[#E8446A]/50 transition-all"
+              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-[#10b981]/50 transition-all"
               placeholder="+/- quantity"
               value={quantity}
               onChange={(e) => setQuantity(e.target.value)}
@@ -82,7 +82,7 @@ const StockAdjustmentModal = ({ isOpen, onClose, onSuccess, product }) => {
             <input
               type="text"
               required
-              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-[#E8446A]/50 transition-all"
+              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-[#10b981]/50 transition-all"
               placeholder="e.g. Damaged goods, manual audit"
               value={reason}
               onChange={(e) => setReason(e.target.value)}
@@ -91,7 +91,7 @@ const StockAdjustmentModal = ({ isOpen, onClose, onSuccess, product }) => {
           
           <div className="flex justify-end space-x-3 pt-4 border-t border-white/10">
             <button type="button" onClick={onClose} className="px-5 py-2.5 rounded-xl text-gray-300 hover:bg-white/5 transition-colors font-medium">Cancel</button>
-            <button type="submit" disabled={loading || newStock < 0} className="px-5 py-2.5 rounded-xl bg-[#E8446A] hover:bg-[#d4375b] text-white transition-all font-medium shadow-[0_0_15px_rgba(232,68,106,0.4)] disabled:opacity-50">
+            <button type="submit" disabled={loading || newStock < 0} className="px-5 py-2.5 rounded-xl bg-[#10b981] hover:bg-[#059669] text-white transition-all font-medium shadow-[0_0_15px_rgba(16,185,129,0.4)] disabled:opacity-50">
               {loading ? 'Processing...' : 'Confirm'}
             </button>
           </div>

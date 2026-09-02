@@ -40,7 +40,7 @@ const Inventory = () => {
   };
 
   return (
-    <div className="min-h-[calc(100vh-64px)] bg-[#1B2A4A] p-8 -m-6" style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}>
+    <div className="min-h-[100vh] bg-[#064e3b] p-8 -m-6" style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}>
       <div className="mb-8">
         <h1 className="text-4xl font-extrabold text-white tracking-tight">Inventory Management</h1>
         <p className="text-gray-400 mt-2">Monitor stock levels and track movements</p>

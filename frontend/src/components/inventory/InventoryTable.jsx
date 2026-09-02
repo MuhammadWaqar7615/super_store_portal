@@ -29,10 +29,10 @@ const InventoryTable = ({ products, onAdjustStock }) => {
                 <td className="px-6 py-4 whitespace-nowrap">
                   {isGoodStock && <span className="px-3 py-1 inline-flex text-xs font-semibold rounded-full bg-green-500/20 text-green-300 border border-green-500/30">Healthy</span>}
                   {isLowStock && <span className="px-3 py-1 inline-flex text-xs font-semibold rounded-full bg-yellow-500/20 text-yellow-300 border border-yellow-500/30">Low Stock</span>}
-                  {isOutOfStock && <span className="px-3 py-1 inline-flex text-xs font-semibold rounded-full bg-[#E8446A]/20 text-[#E8446A] border border-[#E8446A]/30 shadow-[0_0_10px_rgba(232,68,106,0.3)]">Out of Stock</span>}
+                  {isOutOfStock && <span className="px-3 py-1 inline-flex text-xs font-semibold rounded-full bg-[#10b981]/20 text-[#10b981] border border-[#10b981]/30 shadow-[0_0_10px_rgba(16,185,129,0.3)]">Out of Stock</span>}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                  <button onClick={() => onAdjustStock(product)} className="text-[#E8446A] hover:text-pink-400 font-semibold transition-colors">Adjust Stock</button>
+                  <button onClick={() => onAdjustStock(product)} className="text-[#10b981] hover:text-pink-400 font-semibold transition-colors">Adjust Stock</button>
                 </td>
               </tr>
             );

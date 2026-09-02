@@ -41,7 +41,7 @@ const StockMovementList = () => {
                 </p>
               </div>
               <div className="text-right">
-                <p className={`text-sm font-bold ${mov.quantity > 0 ? 'text-green-400' : 'text-[#E8446A]'}`}>
+                <p className={`text-sm font-bold ${mov.quantity > 0 ? 'text-green-400' : 'text-[#10b981]'}`}>
                   {mov.quantity > 0 ? '+' : ''}{mov.quantity}
                 </p>
                 <p className="text-xs text-gray-500">{new Date(mov.createdAt).toLocaleString()}</p>

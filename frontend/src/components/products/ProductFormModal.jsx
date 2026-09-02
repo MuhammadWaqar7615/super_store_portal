@@ -82,7 +82,7 @@ const ProductFormModal = ({ isOpen, onClose, onSuccess, productToEdit }) => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 overflow-y-auto">
-      <div className="bg-[#1B2A4A] border border-white/20 rounded-3xl p-8 w-full max-w-2xl shadow-2xl relative my-8">
+      <div className="bg-[#064e3b] border border-white/20 rounded-3xl p-8 w-full max-w-2xl shadow-2xl relative my-8">
         <h2 className="text-2xl font-bold text-white mb-6 relative z-10">
           {productToEdit ? 'Edit Product' : 'Add Product'}
         </h2>
@@ -141,7 +141,7 @@ const ProductFormModal = ({ isOpen, onClose, onSuccess, productToEdit }) => {
           
           <div className="flex justify-end space-x-3 pt-4 border-t border-white/10">
             <button type="button" onClick={onClose} className="px-5 py-2.5 rounded-xl text-gray-300 hover:bg-white/5 font-medium">Cancel</button>
-            <button type="submit" disabled={loading} className="px-5 py-2.5 rounded-xl bg-[#E8446A] hover:bg-[#d4375b] text-white font-medium shadow-[0_0_15px_rgba(232,68,106,0.4)] disabled:opacity-50">
+            <button type="submit" disabled={loading} className="px-5 py-2.5 rounded-xl bg-[#10b981] hover:bg-[#059669] text-white font-medium shadow-[0_0_15px_rgba(16,185,129,0.4)] disabled:opacity-50">
               {loading ? 'Saving...' : 'Save Product'}
             </button>
           </div>

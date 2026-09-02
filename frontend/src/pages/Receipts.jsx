@@ -26,7 +26,7 @@ const Receipts = () => {
 
         setSales(currentMonthSales);
       } catch (err) {
-        setError('Failed to load receipts.');
+        setError('No receipt found');
         console.error(err);
       } finally {
         setLoading(false);
@@ -38,7 +38,7 @@ const Receipts = () => {
 
   if (loading) {
     return (
-      <div className="min-h-[calc(100vh-64px)] bg-[#1B2A4A] p-8 -m-8 text-white">
+      <div className="min-h-[100vh] bg-[#064e3b] p-8 -m-8 text-white">
         <div className="max-w-6xl mx-auto">
           <h1 className="text-3xl font-bold mb-6">Receipts (This Month)</h1>
           <div className="animate-pulse space-y-4">
@@ -53,14 +53,17 @@ const Receipts = () => {
 
   if (error) {
     return (
-      <div className="min-h-[calc(100vh-64px)] bg-[#1B2A4A] p-8 -m-8 flex items-center justify-center">
-        <div className="text-red-500 text-xl bg-white/5 p-8 rounded-2xl">{error}</div>
+      <div className="min-h-[100vh] bg-[#064e3b] p-8 -m-8 flex flex-col items-center justify-center">
+        <div className="text-gray-300 text-lg font-medium bg-white/5 px-12 py-8 rounded-2xl border border-white/10 shadow-xl backdrop-blur-md flex flex-col items-center">
+          <svg className="w-12 h-12 mb-4 text-gray-500 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+          {error}
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-[calc(100vh-64px)] bg-[#1B2A4A] p-8 -m-8" style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}>
+    <div className="min-h-[100vh] bg-[#064e3b] p-8 -m-8" style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}>
       <div className="text-white max-w-6xl mx-auto">
         <h1 className="text-3xl font-bold mb-6">Receipts (This Month)</h1>
         <div className="bg-white/5 p-6 rounded-2xl shadow-xl border border-white/10 backdrop-blur-md">

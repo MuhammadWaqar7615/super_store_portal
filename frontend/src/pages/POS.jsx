@@ -115,23 +115,25 @@ const POS = () => {
   const canPay = cart.length > 0 && selectedCustomer !== null;
 
   return (
-    <div className="flex flex-col h-full bg-slate-50 relative font-sans text-slate-800">
+    <div className="flex flex-col h-full bg-transparent relative font-sans text-white">
 
 
       {/* 3.2 Main Content Area */}
-      {/* pb-28 to account for the 96px bottom bar + padding */}
-      <div className="flex flex-1 overflow-hidden p-6 gap-6 pb-28">
+      {/* pb-24 to precisely account for the 96px (h-24) bottom bar */}
+      <div className="flex flex-col lg:flex-row flex-1 overflow-y-auto lg:overflow-hidden pb-24 lg:divide-x divide-white/10">
 
         {/* Left Column (65%) */}
-        <div className="w-[65%] flex flex-col gap-6 h-full">
+        <div className="w-full lg:w-[65%] flex flex-col lg:h-full divide-y divide-white/10 flex-shrink-0">
           {/* Top half: Product Search */}
           <div className={`${isCartExpanded ? 'h-[50%]' : 'flex-1'} min-h-0 transition-all duration-300`}>
-            <POSSearch
-              products={products}
-              onAddToCart={handleAddToCart}
-              searchTerm={searchTerm}
-              setSearchTerm={setSearchTerm}
-            />
+              <POSSearch
+                products={products}
+                onAddToCart={handleAddToCart}
+                searchTerm={searchTerm}
+                setSearchTerm={setSearchTerm}
+                onClearCart={handleClearCart}
+                cart={cart}
+              />
           </div>
 
           {/* Bottom half: Current Cart */}
@@ -147,14 +149,14 @@ const POS = () => {
         </div>
 
         {/* Right Column (35%) */}
-        <div className="w-[35%] h-full flex flex-col gap-4">
+        <div className="w-full lg:w-[35%] lg:h-full flex flex-col bg-black/20 p-4 lg:p-6 border-t lg:border-t-0 border-white/10 flex-shrink-0">
           {/* Section Header Toggles */}
-          <div className="flex bg-slate-100 p-1 rounded-lg w-fit">
+          <div className="flex gap-1 bg-black/40 p-1 rounded-lg w-full mb-4">
             <button
               onClick={() => setActiveTab('cart')}
-              className={`flex items-center space-x-2 px-4 py-2 rounded-md text-[14px] font-medium transition-colors ${activeTab === 'cart'
-                  ? 'bg-white text-blue-600 shadow-sm'
-                  : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200'
+              className={`flex-1 flex items-center justify-center space-x-2 px-4 py-2 rounded-md text-[14px] font-medium transition-colors ${activeTab === 'cart'
+                  ? 'bg-white/10 backdrop-blur-md text-[#10b981] shadow-sm'
+                  : 'text-gray-300 hover:text-gray-100 hover:bg-white/10'
                 }`}
             >
               <ShoppingCart className="w-4 h-4" />
@@ -163,9 +165,9 @@ const POS = () => {
 
             <button
               onClick={() => setActiveTab('pending')}
-              className={`flex items-center space-x-2 px-4 py-2 rounded-md text-[14px] font-medium transition-colors relative ${activeTab === 'pending'
-                  ? 'bg-white text-blue-600 shadow-sm'
-                  : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200'
+              className={`flex-1 flex items-center justify-center space-x-2 px-4 py-2 rounded-md text-[14px] font-medium transition-colors relative ${activeTab === 'pending'
+                  ? 'bg-white/10 backdrop-blur-md text-[#10b981] shadow-sm'
+                  : 'text-gray-300 hover:text-gray-100 hover:bg-white/10'
                 }`}
             >
               <Clock className="w-4 h-4" />
@@ -186,12 +188,12 @@ const POS = () => {
                   setSelectedCustomer={setSelectedCustomer}
                 />
 
-                <div className="mt-4 flex-1 bg-white rounded-[8px] border border-slate-200 shadow-[0_1px_3px_rgba(0,0,0,0.06)] p-6 flex flex-col justify-center items-center text-center opacity-70">
-                  <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mb-4">
+                <div className="mt-4 flex-1 bg-white/5 rounded-2xl border border-white/5 shadow-[0_1px_3px_rgba(0,0,0,0.06)] p-6 flex flex-col justify-center items-center text-center opacity-70">
+                  <div className="w-16 h-16 bg-[#10b981]/20 rounded-full flex items-center justify-center mb-4">
                     <svg className="w-8 h-8 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                   </div>
-                  <h4 className="text-[16px] font-semibold text-slate-700 mb-2">Checkout Ready</h4>
-                  <p className="text-[14px] text-slate-500 max-w-xs">Build the cart on the left, select a customer, and click Pay Now to process the transaction.</p>
+                  <h4 className="text-[16px] font-semibold text-gray-100 mb-2">Checkout Ready</h4>
+                  <p className="text-[14px] text-gray-300 max-w-xs">Build the cart on the left, select a customer, and click Pay Now to process the transaction.</p>
                 </div>
               </div>
             ) : (
@@ -203,11 +205,9 @@ const POS = () => {
           </div>
         </div>
       </div>
-
       {/* 3.3 Bottom Action Bar */}
       <POSBottomBar
         subtotal={subtotal}
-        onClearCart={handleClearCart}
         onPayNow={handleCheckoutClick}
         canPay={canPay}
       />

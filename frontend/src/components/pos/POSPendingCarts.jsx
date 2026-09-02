@@ -69,21 +69,21 @@ const POSPendingCarts = ({ onFinalizeSuccess, onBadgeUpdate }) => {
   }
 
   return (
-    <div className="flex flex-col h-full bg-slate-50 overflow-hidden">
-      <div className="p-6 border-b border-slate-200 bg-white">
-        <h2 className="text-[20px] font-semibold text-slate-800 flex items-center">
-          <Clock className="w-5 h-5 mr-2 text-slate-500" />
+    <div className="flex flex-col h-full bg-transparent overflow-hidden">
+      <div className="p-6 border-b border-white/20 bg-white/10 backdrop-blur-md">
+        <h2 className="text-[20px] font-semibold text-white flex items-center">
+          <Clock className="w-5 h-5 mr-2 text-gray-300" />
           Pending Carts Queue
         </h2>
-        <p className="text-[14px] text-slate-500 mt-1">Customers waiting for checkout</p>
+        <p className="text-[14px] text-gray-300 mt-1">Customers waiting for checkout</p>
       </div>
 
       <div className="flex-1 overflow-y-auto p-6 space-y-4">
         {pendingCarts.length === 0 ? (
           <div className="h-full flex flex-col items-center justify-center opacity-50">
-            <Clock className="w-12 h-12 text-slate-400 mb-4" />
-            <p className="text-[16px] text-slate-600 font-medium">No pending carts</p>
-            <p className="text-[14px] text-slate-400 mt-1">New carts will appear here automatically</p>
+            <Clock className="w-12 h-12 text-gray-400 mb-4" />
+            <p className="text-[16px] text-gray-200 font-medium">No pending carts</p>
+            <p className="text-[14px] text-gray-400 mt-1">New carts will appear here automatically</p>
           </div>
         ) : (
           pendingCarts.map((cart) => {
@@ -93,20 +93,20 @@ const POSPendingCarts = ({ onFinalizeSuccess, onBadgeUpdate }) => {
             return (
               <div 
                 key={cart._id} 
-                className="bg-white rounded-[8px] border border-slate-200 p-4 shadow-[0_1px_3px_rgba(0,0,0,0.06)] hover:shadow-md transition-shadow animate-in fade-in slide-in-from-bottom-2"
+                className="bg-white/10 backdrop-blur-md rounded-[8px] border border-white/20 p-4 shadow-[0_1px_3px_rgba(0,0,0,0.06)] hover:shadow-md transition-shadow animate-in fade-in slide-in-from-bottom-2"
               >
                 <div className="flex justify-between items-start mb-4">
                   <div>
-                    <h3 className="text-[16px] font-bold text-slate-800">
+                    <h3 className="text-[16px] font-bold text-white">
                       {cart.customer?.name || 'Walk-in Customer'}
                     </h3>
-                    <p className="text-[12px] text-slate-500 mt-1">
+                    <p className="text-[12px] text-gray-300 mt-1">
                       Submitted {formatRelativeTime(cart.submittedAt)}
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="text-[18px] font-bold text-slate-800">Rs. {total.toLocaleString()}</p>
-                    <p className="text-[12px] text-slate-500 mt-1">{itemCount} items</p>
+                    <p className="text-[18px] font-bold text-white">Rs. {total.toLocaleString()}</p>
+                    <p className="text-[12px] text-gray-300 mt-1">{itemCount} items</p>
                   </div>
                 </div>
 

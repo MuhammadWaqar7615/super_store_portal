@@ -49,7 +49,7 @@ const Dashboard = () => {
 
   if (loading) {
     return (
-      <div className="min-h-[calc(100vh-64px)] bg-[#1B2A4A] p-8 -m-6" style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}>
+      <div className="min-h-[100vh] bg-[#064e3b] p-8 -m-6" style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}>
         <h1 className="text-3xl font-bold text-white mb-8">Admin Dashboard</h1>
         {/* Skeleton Loaders */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -67,10 +67,10 @@ const Dashboard = () => {
 
   if (error) {
     return (
-      <div className="min-h-[calc(100vh-64px)] bg-[#1B2A4A] p-8 -m-6 flex items-center justify-center">
+      <div className="min-h-[100vh] bg-[#064e3b] p-8 -m-6 flex items-center justify-center">
         <div className="p-6 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 text-center">
-          <p className="text-[#E8446A] text-xl mb-4">{error}</p>
-          <button onClick={() => window.location.reload()} className="px-6 py-2 bg-[#E8446A] text-white rounded-lg hover:bg-[#d4375b] transition-colors">
+          <p className="text-[#10b981] text-xl mb-4">{error}</p>
+          <button onClick={() => window.location.reload()} className="px-6 py-2 bg-[#10b981] text-white rounded-lg hover:bg-[#059669] transition-colors">
             Retry
           </button>
         </div>
@@ -83,7 +83,7 @@ const Dashboard = () => {
   const { metrics, recentSales, lowStockProducts } = data;
 
   return (
-    <div className="min-h-[calc(100vh-64px)] bg-[#1B2A4A] p-8 -m-6" style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}>
+    <div className="min-h-[100vh] bg-[#064e3b] p-8 -m-6" style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}>
       <header className="mb-10">
         <h1 className="text-4xl font-extrabold text-white tracking-tight">Overview</h1>
         <p className="text-gray-400 mt-2">Real-time store metrics and insights</p>
