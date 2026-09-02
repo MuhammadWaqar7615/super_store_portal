@@ -89,16 +89,16 @@ const POSPendingCarts = ({ onFinalizeSuccess, onBadgeUpdate }) => {
           pendingCarts.map((cart) => {
             const itemCount = cart.items.reduce((sum, item) => sum + item.quantity, 0);
             const total = cart.items.reduce((sum, item) => sum + (item.quantity * item.unitPriceSnapshot), 0);
-            
+
             return (
-              <div 
-                key={cart._id} 
+              <div
+                key={cart._id}
                 className="bg-white/10 backdrop-blur-md rounded-[8px] border border-white/20 p-4 shadow-[0_1px_3px_rgba(0,0,0,0.06)] hover:shadow-md transition-shadow animate-in fade-in slide-in-from-bottom-2"
               >
                 <div className="flex justify-between items-start mb-4">
                   <div>
                     <h3 className="text-[16px] font-bold text-white">
-                      {cart.customer?.name || 'Walk-in Customer'}
+                      {cart.customer?.name || 'Customer'}
                     </h3>
                     <p className="text-[12px] text-gray-300 mt-1">
                       Submitted {formatRelativeTime(cart.submittedAt)}
