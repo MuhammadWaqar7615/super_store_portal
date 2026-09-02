@@ -14,6 +14,9 @@ module.exports = async (req, res) => {
     await app(req, res);
   } catch (error) {
     console.error('❌ Serverless Error:', error);
-    res.status(500).json({ success: false, message: 'Internal Server Error' });
+    res.status(500).json({ 
+      success: false, 
+      message: 'Internal Server Error' 
+    });
   }
 };
