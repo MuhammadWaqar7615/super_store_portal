@@ -6,6 +6,7 @@ import {
   LayoutDashboard,
   MonitorPlay,
   ReceiptText,
+  UserRound,
   Tags,
   Package,
   Warehouse,
@@ -44,18 +45,20 @@ const AdminLayout = () => {
   const navItems = [
     { name: 'Dashboard', path: '/dashboard', icon: <LayoutDashboard size={20} /> },
     ...(user?.role === 'Cashier' ? [{ name: 'POS', path: '/pos', icon: <MonitorPlay size={20} /> }] : []),
-    { name: 'Receipts', path: '/receipts', icon: <ReceiptText size={20} /> },
+    { name: 'Sales', path: '/sales', icon: <ReceiptText size={20} /> },
+    { name: 'Receipts', path: '/receipts', icon: <Receipt size={20} /> },
+    { name: 'Products', path: '/products', icon: <Package size={20} /> },
+    { name: 'Customers', path: '/customers', icon: <UserRound size={20} /> },
+    { name: 'Categories', path: '/categories', icon: <Tags size={20} /> },
   ];
 
   const adminNavItems = [
-    { name: 'Categories', path: '/categories', icon: <Tags size={20} /> },
     { name: 'Suppliers', path: '/suppliers', icon: <Truck size={20} /> },
     { name: 'Purchases', path: '/purchases', icon: <PackagePlus size={20} /> },
     { name: 'Users', path: '/users', icon: <UsersRound size={20} /> },
     { name: 'Expenses', path: '/expenses', icon: <Receipt size={20} /> },
     { name: 'Income', path: '/income', icon: <TrendingUp size={20} /> },
     { name: 'Reports', path: '/reports', icon: <BarChart3 size={20} /> },
-    { name: 'Products', path: '/products', icon: <Package size={20} /> },
     { name: 'Inventory', path: '/inventory', icon: <Warehouse size={20} /> },
   ];
 

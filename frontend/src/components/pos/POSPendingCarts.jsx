@@ -98,7 +98,7 @@ const POSPendingCarts = ({ onFinalizeSuccess, onBadgeUpdate }) => {
                 <div className="flex justify-between items-start mb-4">
                   <div>
                     <h3 className="text-[16px] font-bold text-white">
-                      {cart.customer?.name || 'Customer'}
+                      {cart.customerId?.name || 'Customer'}
                     </h3>
                     <p className="text-[12px] text-gray-300 mt-1">
                       Submitted {formatRelativeTime(cart.submittedAt)}

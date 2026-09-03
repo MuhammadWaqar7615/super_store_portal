@@ -2,8 +2,11 @@ import React, { useState, useEffect } from 'react';
 import api from '../services/api';
 import CategoryTable from '../components/categories/CategoryTable';
 import CategoryFormModal from '../components/categories/CategoryFormModal';
+import { useAuth } from '../context/AuthContext';
 
 const Categories = () => {
+  const { user } = useAuth();
+  const isAdmin = user?.role === 'Admin';
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -52,15 +55,15 @@ const Categories = () => {
       <div className="flex justify-between items-center mb-8">
         <div>
           <h1 className="text-4xl font-extrabold text-white tracking-tight">Categories</h1>
-          <p className="text-gray-400 mt-2">Manage product categories</p>
+          <p className="text-gray-400 mt-2">{isAdmin ? 'Manage product categories' : 'View product categories'}</p>
         </div>
-        <button 
+        {isAdmin && <button 
           onClick={openAddModal}
           className="bg-[#10b981] hover:bg-[#059669] text-white px-6 py-3 rounded-xl shadow-[0_0_15px_rgba(16,185,129,0.4)] transition-all font-medium flex items-center"
         >
           <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4"></path></svg>
           Add Category
-        </button>
+        </button>}
       </div>
 
       {loading ? (
@@ -70,15 +73,16 @@ const Categories = () => {
           categories={categories} 
           onEdit={handleEdit} 
           onDelete={handleDelete} 
+          readOnly={!isAdmin}
         />
       )}
 
-      <CategoryFormModal 
+      {isAdmin && <CategoryFormModal 
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSuccess={fetchCategories}
         categoryToEdit={categoryToEdit}
-      />
+      />}
     </div>
   );
 };

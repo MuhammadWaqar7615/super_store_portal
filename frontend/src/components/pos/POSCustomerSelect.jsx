@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import api from '../../services/api';
-import { Search, UserPlus, User, Phone, Mail, X } from 'lucide-react';
+import { UserPlus, User, Phone, Mail, X } from 'lucide-react';
 
 const POSCustomerSelect = ({ selectedCustomer, setSelectedCustomer }) => {
   const [customers, setCustomers] = useState([]);
-  const [search, setSearch] = useState('');
-  const [showDropdown, setShowDropdown] = useState(false);
   
   // Quick Add Modal State
   const [showAddModal, setShowAddModal] = useState(false);
@@ -26,12 +24,6 @@ const POSCustomerSelect = ({ selectedCustomer, setSelectedCustomer }) => {
     }
   };
 
-  const filtered = customers.filter(c =>
-    c.name.toLowerCase().includes(search.toLowerCase()) ||
-    (c.phone && c.phone.includes(search)) ||
-    (c.email && c.email.toLowerCase().includes(search.toLowerCase()))
-  );
-
   const handleQuickAdd = async (e) => {
     e.preventDefault();
     setIsAdding(true);
@@ -45,18 +37,20 @@ const POSCustomerSelect = ({ selectedCustomer, setSelectedCustomer }) => {
       return;
     }
     
-    // Instead of creating a permanent DB customer, just use this info for the receipt
-    setSelectedCustomer({
-      _id: null,
-      isWalkIn: true,
-      name: newCustomer.name,
-      phone: newCustomer.phone,
-      email: newCustomer.email
-    });
+    try {
+      const { data } = await api.post('/customers', {
+        name: newCustomer.name.trim(),
+        phone: newCustomer.phone
+      });
+      setSelectedCustomer({ ...data.data, email: newCustomer.email });
+    } catch (error) {
+      setAddError(error.response?.data?.message || 'Unable to add customer.');
+      setIsAdding(false);
+      return;
+    }
     
     setShowAddModal(false);
     setNewCustomer({ name: '', phone: '', email: '' });
-    setSearch('');
     setIsAdding(false);
   };
 
@@ -115,64 +109,22 @@ const POSCustomerSelect = ({ selectedCustomer, setSelectedCustomer }) => {
             </div>
           </div>
         ) : (
-          <div className="relative">
-            <div className="relative">
-              <input
-                type="text"
-                className="w-full bg-white/10 backdrop-blur-md border border-white/20 rounded-[8px] pl-9 pr-4 py-2.5 text-white text-[14px] placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all shadow-sm"
-                placeholder="Search by name, phone, email..."
-                value={search}
-                onChange={(e) => {
-                  setSearch(e.target.value);
-                  setShowDropdown(true);
-                }}
-                onFocus={() => setShowDropdown(true)}
-              />
-              <Search className="w-4 h-4 text-gray-400 absolute left-3 top-3" />
-            </div>
-            
-            {showDropdown && search && (
-              <div className="absolute top-full mt-1 w-full bg-white/10 backdrop-blur-md border border-white/20 rounded-[8px] shadow-lg max-h-60 overflow-y-auto z-20">
-                <ul className="py-1">
-                  {filtered.map(c => (
-                    <li
-                      key={c._id}
-                      className="px-4 py-2 hover:bg-transparent text-white cursor-pointer border-b border-slate-100 last:border-0"
-                      onClick={() => { 
-                        setSelectedCustomer(c); 
-                        setSearch(''); 
-                        setShowDropdown(false); 
-                      }}
-                    >
-                      <div className="flex justify-between items-center mb-0.5">
-                        <span className="font-semibold text-[14px]">{c.name}</span>
-                        {c.isRegistered && (
-                          <span className="text-[10px] font-bold px-1.5 py-0.5 bg-green-100 text-green-700 rounded-sm">REG</span>
-                        )}
-                      </div>
-                      <div className="flex justify-between items-center text-[12px] text-gray-300">
-                        <span>{c.phone}</span>
-                        <span className="truncate ml-2">{c.email}</span>
-                      </div>
-                    </li>
-                  ))}
-                  {filtered.length === 0 && (
-                    <li className="px-4 py-3 text-gray-300 text-[14px] text-center bg-transparent">
-                      No matching customers found.
-                      <button 
-                        onClick={() => {
-                          setShowDropdown(false);
-                          setShowAddModal(true);
-                        }}
-                        className="block w-full mt-2 text-blue-600 font-medium hover:underline"
-                      >
-                        Add New Customer
-                      </button>
-                    </li>
-                  )}
-                </ul>
-              </div>
-            )}
+          <div>
+            <select
+              value={selectedCustomer?._id || ''}
+              onChange={(event) => {
+                const customer = customers.find(({ _id }) => _id === event.target.value);
+                setSelectedCustomer(customer || null);
+              }}
+              className="w-full bg-white/10 backdrop-blur-md border border-white/20 rounded-[8px] px-4 py-2.5 text-white text-[14px] focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all shadow-sm"
+            >
+              <option value="" className="bg-[#064e3b]">Select a registered customer</option>
+              {customers.filter(customer => customer.isRegistered).map((customer) => (
+                <option key={customer._id} value={customer._id} className="bg-[#064e3b]">
+                  {customer.name} - {customer.phone}
+                </option>
+              ))}
+            </select>
             
             <div className="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-[8px] flex items-start">
               <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center shrink-0 mr-3">
