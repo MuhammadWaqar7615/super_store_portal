@@ -26,6 +26,7 @@ const AdminLayout = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const isStoreManager = user?.role === 'Store_Manager';
   const isPOS = location.pathname === '/pos';
 
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -55,10 +56,8 @@ const AdminLayout = () => {
   const adminNavItems = [
     { name: 'Suppliers', path: '/suppliers', icon: <Truck size={20} /> },
     { name: 'Purchases', path: '/purchases', icon: <PackagePlus size={20} /> },
-    { name: 'Users', path: '/users', icon: <UsersRound size={20} /> },
     { name: 'Expenses', path: '/expenses', icon: <Receipt size={20} /> },
     { name: 'Income', path: '/income', icon: <TrendingUp size={20} /> },
-    { name: 'Reports', path: '/reports', icon: <BarChart3 size={20} /> },
     { name: 'Inventory', path: '/inventory', icon: <Warehouse size={20} /> },
   ];
 
@@ -126,10 +125,10 @@ const AdminLayout = () => {
             </Link>
           ))}
 
-          {user?.role === 'Admin' && (
+          {(user?.role === 'Admin' || isStoreManager) && (
             <div className="pt-4 pb-1">
               <div className={`overflow-hidden transition-all duration-300 ${isCollapsed ? 'h-0 opacity-0' : 'h-auto opacity-100 px-3 mb-2'}`}>
-                <p className="text-[11px] uppercase text-gray-500 font-semibold tracking-wider">Admin</p>
+                <p className="text-[11px] uppercase text-gray-500 font-semibold tracking-wider">Operations</p>
               </div>
 
               {adminNavItems.map((item) => (
@@ -148,6 +147,40 @@ const AdminLayout = () => {
                   </div>
                 </Link>
               ))}
+
+              {user?.role === 'Admin' && (
+                <>
+                  <div className={`overflow-hidden transition-all duration-300 ${isCollapsed ? 'h-0 opacity-0' : 'h-auto opacity-100 px-3 mb-2 mt-4'}`}>
+                    <p className="text-[11px] uppercase text-gray-500 font-semibold tracking-wider">Admin</p>
+                  </div>
+                  <Link
+                    to="/users"
+                    onClick={() => { if (window.innerWidth < 1024) setIsMobileOpen(false); }}
+                    className={`flex items-center ${isCollapsed ? 'justify-center w-10 h-10 mx-auto rounded-full mt-1' : 'px-3 py-2.5 rounded-xl mt-1'} transition-all group ${location.pathname === '/users' ? 'bg-[#1a2321] text-[#10b981]' : 'text-gray-300 hover:bg-[#1a1a1a] hover:text-white'}`}
+                    title={isCollapsed ? 'Users' : ''}
+                  >
+                    <div className="flex-shrink-0 flex items-center justify-center w-6 h-6">
+                      <UsersRound size={18} />
+                    </div>
+                    <div className={`overflow-hidden transition-all duration-300 whitespace-nowrap ${isCollapsed ? 'w-0 opacity-0' : 'w-auto opacity-100 ml-3'}`}>
+                      <span className="font-medium text-[14px]">Users</span>
+                    </div>
+                  </Link>
+                  <Link
+                    to="/reports"
+                    onClick={() => { if (window.innerWidth < 1024) setIsMobileOpen(false); }}
+                    className={`flex items-center ${isCollapsed ? 'justify-center w-10 h-10 mx-auto rounded-full mt-1' : 'px-3 py-2.5 rounded-xl mt-1'} transition-all group ${location.pathname === '/reports' ? 'bg-[#1a2321] text-[#10b981]' : 'text-gray-300 hover:bg-[#1a1a1a] hover:text-white'}`}
+                    title={isCollapsed ? 'Reports' : ''}
+                  >
+                    <div className="flex-shrink-0 flex items-center justify-center w-6 h-6">
+                      <BarChart3 size={18} />
+                    </div>
+                    <div className={`overflow-hidden transition-all duration-300 whitespace-nowrap ${isCollapsed ? 'w-0 opacity-0' : 'w-auto opacity-100 ml-3'}`}>
+                      <span className="font-medium text-[14px]">Reports</span>
+                    </div>
+                  </Link>
+                </>
+              )}
             </div>
           )}
         </nav>

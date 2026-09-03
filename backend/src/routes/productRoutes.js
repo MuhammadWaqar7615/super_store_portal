@@ -7,11 +7,11 @@ const upload = require('../middleware/uploadMiddleware');
 
 router.route('/')
   .get(protect, getProducts)
-  .post(protect, authorizeRoles('Admin'), upload.single('image'), createProduct);
+  .post(protect, authorizeRoles('Admin', 'Store_Manager'), upload.single('image'), createProduct);
 
 router.route('/:id')
   .get(protect, getProductById)
-  .put(protect, authorizeRoles('Admin'), upload.single('image'), updateProduct)
-  .delete(protect, authorizeRoles('Admin'), deleteProduct);
+  .put(protect, authorizeRoles('Admin', 'Store_Manager'), upload.single('image'), updateProduct)
+  .delete(protect, authorizeRoles('Admin', 'Store_Manager'), deleteProduct);
 
 module.exports = router;

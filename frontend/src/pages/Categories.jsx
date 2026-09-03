@@ -6,7 +6,7 @@ import { useAuth } from '../context/AuthContext';
 
 const Categories = () => {
   const { user } = useAuth();
-  const isAdmin = user?.role === 'Admin';
+  const canManageCategories = user?.role === 'Admin' || user?.role === 'Store_Manager';
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -55,9 +55,9 @@ const Categories = () => {
       <div className="flex justify-between items-center mb-8">
         <div>
           <h1 className="text-4xl font-extrabold text-white tracking-tight">Categories</h1>
-          <p className="text-gray-400 mt-2">{isAdmin ? 'Manage product categories' : 'View product categories'}</p>
+          <p className="text-gray-400 mt-2">{canManageCategories ? 'Manage product categories' : 'View product categories'}</p>
         </div>
-        {isAdmin && <button 
+        {canManageCategories && <button
           onClick={openAddModal}
           className="bg-[#10b981] hover:bg-[#059669] text-white px-6 py-3 rounded-xl shadow-[0_0_15px_rgba(16,185,129,0.4)] transition-all font-medium flex items-center"
         >
@@ -73,11 +73,11 @@ const Categories = () => {
           categories={categories} 
           onEdit={handleEdit} 
           onDelete={handleDelete} 
-          readOnly={!isAdmin}
+          readOnly={!canManageCategories}
         />
       )}
 
-      {isAdmin && <CategoryFormModal 
+      {canManageCategories && <CategoryFormModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSuccess={fetchCategories}

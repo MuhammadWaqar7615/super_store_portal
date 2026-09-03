@@ -13,6 +13,11 @@ const Dashboard = () => {
   const [error, setError] = useState(null);
   const { user } = useAuth();
   const navigate = useNavigate();
+  const isStoreManager = user?.role === 'Store_Manager';
+  const dashboardTitle = isStoreManager ? 'Store Manager Dashboard' : 'Admin Dashboard';
+  const dashboardSubtitle = isStoreManager
+    ? 'Operational store metrics and inventory insights'
+    : 'Real-time business metrics and insights';
 
   useEffect(() => {
     // If Cashier, we don't need to fetch admin metrics here
@@ -20,9 +25,9 @@ const Dashboard = () => {
       return;
     }
 
-    // Enforcement: Only Admin can view admin dashboard
-    if (user?.role !== 'Admin') {
-      setError('Unauthorized access. Only Admins can view the dashboard.');
+    // Enforcement: Admin and Store Manager can view the operational dashboard
+    if (user?.role !== 'Admin' && user?.role !== 'Store_Manager') {
+      setError('Unauthorized access. Only Admins and Store Managers can view the dashboard.');
       setLoading(false);
       return;
     }
@@ -50,7 +55,7 @@ const Dashboard = () => {
   if (loading) {
     return (
       <div className="min-h-[100vh] bg-[#064e3b] p-8 -m-6" style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}>
-        <h1 className="text-3xl font-bold text-white mb-8">Admin Dashboard</h1>
+        <h1 className="text-3xl font-bold text-white mb-8">{dashboardTitle}</h1>
         {/* Skeleton Loaders */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           {[1, 2, 3, 4].map(i => (
@@ -85,8 +90,8 @@ const Dashboard = () => {
   return (
     <div className="min-h-[100vh] bg-[#064e3b] p-8 -m-6" style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}>
       <header className="mb-10">
-        <h1 className="text-4xl font-extrabold text-white tracking-tight">Overview</h1>
-        <p className="text-gray-400 mt-2">Real-time store metrics and insights</p>
+        <h1 className="text-4xl font-extrabold text-white tracking-tight">{dashboardTitle}</h1>
+        <p className="text-gray-400 mt-2">{dashboardSubtitle}</p>
       </header>
 
       {/* Metrics Grid */}

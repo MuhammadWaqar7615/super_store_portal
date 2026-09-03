@@ -6,10 +6,10 @@ const { authorizeRoles } = require('../middleware/roleMiddleware');
 
 router.route('/')
   .get(protect, getCategories)
-  .post(protect, authorizeRoles('Admin'), createCategory);
+  .post(protect, authorizeRoles('Admin', 'Store_Manager'), createCategory);
 
 router.route('/:id')
-  .put(protect, authorizeRoles('Admin'), updateCategory)
-  .delete(protect, authorizeRoles('Admin'), deleteCategory);
+  .put(protect, authorizeRoles('Admin', 'Store_Manager'), updateCategory)
+  .delete(protect, authorizeRoles('Admin', 'Store_Manager'), deleteCategory);
 
 module.exports = router;

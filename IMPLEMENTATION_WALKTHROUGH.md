@@ -689,7 +689,7 @@ The User model in `backend/src/models/User.js` now supports:
 - `name`
 - `email`
 - `password`
-- `role` (`Admin` or `Cashier`)
+- `role` (`Admin`, `Store_Manager`, or `Cashier`; the UI displays `Store_Manager` as `Store Manager`)
 - `isActive`
 
 The `name` field has a default value so existing seeded accounts remain compatible.
@@ -726,7 +726,7 @@ New files:
 - `frontend/src/pages/Users.jsx`
 - `frontend/src/services/userService.js`
 
-The page is routed at `/users` and is visible only to Admin users. It provides account creation, editing, active-status control, password updates, and deletion. The current Admin account cannot be deleted or deactivated from its own row.
+The page is routed at `/users` and is visible only to Admin users. It provides account creation, editing, active-status control, password updates, and deletion. The current Admin account cannot be deleted or deactivated from its own row. The create form requires Name, Email, Password, and Role, and supports selecting `Cashier`, `Store Manager`, or `Admin`. The API stores the Store Manager role as `Store_Manager`; it also accepts the space and hyphen spellings for compatibility.
 
 ## Module 4: Expenses and Income
 
@@ -906,7 +906,7 @@ All executable checks passed. The frontend production build completed successful
 - Login rate limiting with `express-rate-limit`.
 - Swagger/OpenAPI documentation.
 
-The POS sidebar visibility change was intentionally excluded from this walkthrough, as requested. The underlying POS sale-completion transaction remains documented in Module 0.
+The POS sidebar is available to Admin and Cashier users only. Store Managers retain Sales and Receipts visibility but cannot open the POS or submit POS transactions.
 
 ## Latest Fixes: Income, Roles, and Payment Methods
 
@@ -951,12 +951,13 @@ Implementation details:
 - `backend/src/routes/saleRoutes.js` allows only Admin/Cashier staff tokens.
 - `backend/src/controllers/saleController.js` rejects a Cashier completing another Cashier's Sale.
 
-This project represents staff roles as `Admin` and `Cashier`. Customer tokens are identified by the existing authentication middleware because they do not contain the staff JWT `role` claim.
+This project now represents staff roles as `Admin`, `Store_Manager`, and `Cashier`. The frontend displays `Store_Manager` as `Store Manager`. Customer tokens are identified by the existing authentication middleware because they do not contain the staff JWT `role` claim.
 
 Expected access behavior:
 
 - A Customer can complete their own self-checkout Sale.
 - A Customer cannot complete another Customer's Sale.
+- A Store Manager can manage catalog and inventory operations and access the operational dashboard, but cannot use the POS.
 - A Cashier can complete only their own POS Sale.
 - A Cashier cannot complete another Cashier's Sale.
 - An Admin can complete any Sale.

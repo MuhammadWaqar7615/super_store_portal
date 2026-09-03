@@ -3,7 +3,7 @@ const controller = require('../controllers/financeController');
 const { protect } = require('../middleware/authMiddleware');
 const { authorizeRoles } = require('../middleware/roleMiddleware');
 const router = express.Router();
-const adminOnly = [protect, authorizeRoles('Admin')];
+const adminOnly = [protect, authorizeRoles('Admin', 'Store_Manager')];
 router.get('/expenses', ...adminOnly, controller.listExpenses);
 router.post('/expenses', ...adminOnly, controller.createExpense);
 router.put('/expenses/:id', ...adminOnly, controller.updateExpense);

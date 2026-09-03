@@ -4,7 +4,7 @@ const { submitCart, getPendingCarts, getCartById, finalizeCart, rejectCart, comp
 const { protect } = require('../middleware/authMiddleware');
 const { authorizeRoles } = require('../middleware/roleMiddleware');
 
-const cashierOnly = authorizeRoles('Cashier');
+const cashierOnly = authorizeRoles('Admin', 'Cashier');
 const customerOnly = (req, res, next) => {
 	if (req.user && !req.user.role) return next();
 	return res.status(403).json({ success: false, message: 'Customer access required' });

@@ -4,7 +4,7 @@ const { getDashboardMetrics, getCashierDashboardMetrics, getSalesReport, getPurc
 const { protect } = require('../middleware/authMiddleware');
 const { authorizeRoles } = require('../middleware/roleMiddleware');
 
-router.get('/dashboard', protect, authorizeRoles('Admin'), getDashboardMetrics);
+router.get('/dashboard', protect, authorizeRoles('Admin', 'Store_Manager'), getDashboardMetrics);
 router.get('/cashier-dashboard', protect, authorizeRoles('Cashier'), getCashierDashboardMetrics);
 router.get('/sales', protect, authorizeRoles('Admin'), getSalesReport);
 router.get('/purchases', protect, authorizeRoles('Admin'), getPurchasesReport);

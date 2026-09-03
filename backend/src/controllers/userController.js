@@ -1,6 +1,14 @@
 const User = require('../models/User');
 const { hashPassword } = require('./authController');
 
+const normalizeRole = (role) => ({
+  Admin: 'Admin',
+  Cashier: 'Cashier',
+  'Store Manager': 'Store_Manager',
+  'Store-Manager': 'Store_Manager',
+  Store_Manager: 'Store_Manager',
+}[role]);
+
 const publicUser = (user) => {
   const result = user.toObject ? user.toObject() : user;
   delete result.password;
@@ -19,12 +27,16 @@ const getUsers = async (req, res) => {
 const createUser = async (req, res) => {
   try {
     const { name, email, password } = req.body;
+    const role = normalizeRole(req.body.role);
     if (!name || !email || !password) {
       return res.status(422).json({ success: false, message: 'Name, email, and password are required' });
     }
+    if (!role) {
+      return res.status(422).json({ success: false, message: 'A valid role is required' });
+    }
     const exists = await User.findOne({ email: email.toLowerCase() });
     if (exists) return res.status(409).json({ success: false, message: 'Email is already in use' });
-    const user = await User.create({ name, email, password: await hashPassword(password), role: 'Cashier' });
+    const user = await User.create({ name, email, password: await hashPassword(password), role });
     res.status(201).json({ success: true, data: publicUser(user) });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Server error creating user' });
@@ -33,13 +45,19 @@ const createUser = async (req, res) => {
 
 const updateUser = async (req, res) => {
   try {
-    const { name, role, isActive, password } = req.body;
+    const { name, isActive, password } = req.body;
+    const role = req.body.role === undefined ? undefined : normalizeRole(req.body.role);
     if (req.params.id === req.user._id.toString() && isActive === false) {
       return res.status(403).json({ success: false, message: 'You cannot deactivate your own account' });
     }
     const updates = {};
     if (name !== undefined) updates.name = name;
-    if (role !== undefined) updates.role = role;
+    if (role !== undefined) {
+      if (!role) {
+        return res.status(422).json({ success: false, message: 'A valid role is required' });
+      }
+      updates.role = role;
+    }
     if (isActive !== undefined) updates.isActive = isActive;
     if (password) updates.password = await hashPassword(password);
     const user = await User.findByIdAndUpdate(req.params.id, { $set: updates }, { new: true, runValidators: true }).select('-password');

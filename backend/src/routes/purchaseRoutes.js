@@ -4,7 +4,7 @@ const { protect } = require('../middleware/authMiddleware');
 const { authorizeRoles } = require('../middleware/roleMiddleware');
 
 const router = express.Router();
-const adminOnly = [protect, authorizeRoles('Admin')];
+const adminOnly = [protect, authorizeRoles('Admin', 'Store_Manager')];
 
 router.get('/', ...adminOnly, getPurchases);
 router.post('/', ...adminOnly, createPurchase);
