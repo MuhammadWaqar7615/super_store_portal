@@ -84,6 +84,66 @@ const getProfitLossReport = async (req, res) => {
   } catch (error) { res.status(500).json({ success: false, message: 'Server error generating profit and loss report' }); }
 };
 
+const getAccountantDashboardMetrics = async (req, res) => {
+  try {
+    const match = req.query.from || req.query.to ? dateMatch('createdAt', req.query) : {};
+    const expenseMatch = req.query.from || req.query.to ? dateMatch('date', req.query) : {};
+    const incomeMatch = req.query.from || req.query.to ? dateMatch('date', req.query) : {};
+    const saleMatch = { status: 'completed', ...match };
+
+    const [salesAgg, expenseAgg, cogsAgg, recentExpenses, recentIncome, expenseByCategory, incomeByType] = await Promise.all([
+      Sale.aggregate([
+        { $match: saleMatch },
+        { $group: { _id: null, totalRevenue: { $sum: '$total' }, totalOrders: { $sum: 1 } } }
+      ]),
+      Expense.aggregate([
+        { $match: expenseMatch },
+        { $group: { _id: null, totalExpenses: { $sum: '$amount' } } }
+      ]),
+      Sale.aggregate([
+        { $match: saleMatch },
+        {
+          $project: {
+            cogs: {
+              $sum: {
+                $map: {
+                  input: '$items',
+                  as: 'item',
+                  in: { $multiply: ['$$item.purchaseCost', '$$item.quantity'] }
+                }
+              }
+            }
+          }
+        },
+        { $group: { _id: null, totalCOGS: { $sum: '$cogs' } } }
+      ]),
+      Expense.find(expenseMatch).sort({ date: -1 }).limit(5),
+      Income.find(incomeMatch).sort({ date: -1 }).limit(5).populate('referenceId', 'invoiceNumber'),
+      Expense.aggregate([{ $match: expenseMatch }, { $group: { _id: '$category', total: { $sum: '$amount' }, count: { $sum: 1 } } }, { $sort: { total: -1 } }]),
+      Income.aggregate([{ $match: incomeMatch }, { $group: { _id: '$referenceType', total: { $sum: '$amount' }, count: { $sum: 1 } } }])
+    ]);
+
+    const totalRevenue = salesAgg[0]?.totalRevenue || 0;
+    const totalOrders = salesAgg[0]?.totalOrders || 0;
+    const totalExpenses = expenseAgg[0]?.totalExpenses || 0;
+    const totalCOGS = cogsAgg[0]?.totalCOGS || 0;
+    const netProfit = totalRevenue - totalCOGS - totalExpenses;
+
+    res.json({
+      success: true,
+      data: {
+        metrics: { totalRevenue, totalOrders, totalExpenses, totalCOGS, netProfit },
+        recentExpenses,
+        recentIncome,
+        expenseByCategory,
+        incomeByType
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Server error fetching accountant dashboard metrics' });
+  }
+};
+
 const getDashboardMetrics = async (req, res) => {
   try {
     // 1. Sales & Orders Aggregation
@@ -252,5 +312,6 @@ module.exports = {
   getPaymentsReport,
   getExpensesReport,
   getIncomeReport,
-  getProfitLossReport
+  getProfitLossReport,
+  getAccountantDashboardMetrics
 };

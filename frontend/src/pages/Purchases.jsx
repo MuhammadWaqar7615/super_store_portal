@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { PackagePlus, Plus, Trash2 } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import purchaseService from '../services/purchaseService';
 import supplierService from '../services/supplierService';
@@ -7,6 +8,8 @@ import supplierService from '../services/supplierService';
 const emptyLine = { productId: '', quantity: 1, purchasePrice: '' };
 
 const Purchases = () => {
+  const { user } = useAuth();
+  const canManagePurchases = user?.role === 'Admin' || user?.role === 'Store_Manager';
   const [suppliers, setSuppliers] = useState([]);
   const [products, setProducts] = useState([]);
   const [purchases, setPurchases] = useState([]);
@@ -19,8 +22,8 @@ const Purchases = () => {
   const loadData = async () => {
     try {
       const [supplierResponse, productResponse, purchaseResponse] = await Promise.all([
-        supplierService.getSuppliers({ isActive: 'true' }),
-        api.get('/products'),
+        canManagePurchases ? supplierService.getSuppliers({ isActive: 'true' }) : Promise.resolve({ data: [] }),
+        canManagePurchases ? api.get('/products') : Promise.resolve({ data: { data: [] } }),
         purchaseService.getPurchases()
       ]);
       setSuppliers(supplierResponse.data || []);
@@ -33,7 +36,7 @@ const Purchases = () => {
     }
   };
 
-  useEffect(() => { loadData(); }, []);
+  useEffect(() => { loadData(); }, [canManagePurchases]);
 
   const updateLine = (index, field, value) => {
     setItems(current => current.map((item, lineIndex) => (
@@ -71,7 +74,7 @@ const Purchases = () => {
 
       {error && <div className="mb-4 rounded-xl border border-red-400/40 bg-red-500/15 p-3 text-red-100">{error}</div>}
 
-      <form onSubmit={submitPurchase} className="bg-white/10 border border-white/15 rounded-2xl p-5 mb-8">
+      {canManagePurchases && <form onSubmit={submitPurchase} className="bg-white/10 border border-white/15 rounded-2xl p-5 mb-8">
         <div className="flex flex-col md:flex-row gap-4 mb-5">
           <label className="flex-1 text-sm text-gray-300">Supplier
             <select required value={supplierId} onChange={event => setSupplierId(event.target.value)} className="mt-1 w-full rounded-xl bg-black/20 border border-white/20 px-3 py-2.5 text-white">
@@ -105,7 +108,7 @@ const Purchases = () => {
           <button type="button" onClick={() => setItems(current => [...current, { ...emptyLine }])} className="inline-flex items-center gap-2 text-[#6ee7b7] text-sm"><Plus size={16} /> Add line</button>
           <button disabled={saving || !supplierId} className="rounded-xl bg-[#10b981] px-5 py-2.5 font-semibold disabled:opacity-50">{saving ? 'Saving...' : 'Save Purchase'}</button>
         </div>
-      </form>
+      </form>}
 
       <div className="bg-white/10 border border-white/15 rounded-2xl overflow-x-auto">
         <table className="min-w-full text-sm">

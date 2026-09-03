@@ -7,6 +7,7 @@ const normalizeRole = (role) => ({
   'Store Manager': 'Store_Manager',
   'Store-Manager': 'Store_Manager',
   Store_Manager: 'Store_Manager',
+  'Accounts/Finance': 'Accounts/Finance',
 }[role]);
 
 const publicUser = (user) => {

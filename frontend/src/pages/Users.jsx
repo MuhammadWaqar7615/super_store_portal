@@ -7,9 +7,14 @@ const blankForm = { name: '', email: '', password: '', role: 'Cashier', isActive
 const roles = [
   { value: 'Cashier', label: 'Cashier' },
   { value: 'Store_Manager', label: 'Store Manager' },
+  { value: 'Accounts/Finance', label: 'Accounts / Finance' },
   { value: 'Admin', label: 'Admin' },
 ];
-const roleLabel = (role) => role === 'Store_Manager' || role === 'Store-Manager' || role === 'Store Manager' ? 'Store Manager' : role;
+const roleLabel = (role) => {
+  if (role === 'Store_Manager' || role === 'Store-Manager' || role === 'Store Manager') return 'Store Manager';
+  if (role === 'Accounts/Finance') return 'Accounts / Finance';
+  return role;
+};
 
 const Users = () => {
   const { user: currentUser } = useAuth();

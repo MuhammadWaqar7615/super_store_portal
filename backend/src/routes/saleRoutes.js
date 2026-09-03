@@ -4,7 +4,7 @@ const { validateCart, createSale, completeExistingSale, getSales, getSaleById } 
 const { protect } = require('../middleware/authMiddleware');
 const { authorizeRoles } = require('../middleware/roleMiddleware');
 
-const staffOnly = authorizeRoles('Admin', 'Store_Manager', 'Cashier');
+const staffOnly = authorizeRoles('Admin', 'Store_Manager', 'Cashier', 'Accounts/Finance', 'Auditor');
 const posStaffOnly = authorizeRoles('Admin', 'Cashier');
 
 router.post('/validate', protect, posStaffOnly, validateCart);

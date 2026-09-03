@@ -13,6 +13,7 @@ const Dashboard = () => {
   const [error, setError] = useState(null);
   const { user } = useAuth();
   const navigate = useNavigate();
+  const isFinance = user?.role === 'Accounts/Finance';
   const isStoreManager = user?.role === 'Store_Manager';
   const dashboardTitle = isStoreManager ? 'Store Manager Dashboard' : 'Admin Dashboard';
   const dashboardSubtitle = isStoreManager
@@ -20,6 +21,10 @@ const Dashboard = () => {
     : 'Real-time business metrics and insights';
 
   useEffect(() => {
+    if (isFinance) {
+      navigate('/accountant-dashboard', { replace: true });
+      return;
+    }
     // If Cashier, we don't need to fetch admin metrics here
     if (user?.role === 'Cashier') {
       return;
@@ -46,7 +51,7 @@ const Dashboard = () => {
     };
 
     fetchMetrics();
-  }, [user, navigate]);
+  }, [user, navigate, isFinance]);
 
   if (user?.role === 'Cashier') {
     return <CashierDashboard />;

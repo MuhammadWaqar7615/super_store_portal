@@ -35,15 +35,44 @@ const listIncome = async (req, res) => {
   catch (error) { res.status(500).json({ success: false, message: 'Server error fetching income' }); }
 };
 const createIncome = async (req, res) => {
-  try { res.status(201).json({ success: true, data: await Income.create({ ...req.body, source: req.body.source || 'Manual', referenceType: 'manual', referenceId: undefined, createdBy: req.user._id }) }); }
+  try {
+    res.status(201).json({
+      success: true,
+      data: await Income.create({
+        ...req.body,
+        source: req.body.source || 'Manual',
+        referenceType: 'manual',
+        referenceId: undefined,
+        createdBy: req.user._id,
+      })
+    });
+  }
   catch (error) { res.status(422).json({ success: false, message: error.message }); }
 };
 const updateIncome = async (req, res) => {
-  try { const income = await Income.findById(req.params.id); if (!income) return res.status(404).json({ success: false, message: 'Income not found' }); if (income.referenceType !== 'manual') return res.status(409).json({ success: false, message: 'Sale-linked income is read-only' }); const allowed = { title: req.body.title, source: req.body.source, amount: req.body.amount, date: req.body.date }; Object.assign(income, allowed); await income.save(); res.json({ success: true, data: income }); }
+  try {
+    const income = await Income.findById(req.params.id);
+    if (!income) return res.status(404).json({ success: false, message: 'Income not found' });
+    if (income.referenceType !== 'manual') {
+      return res.status(403).json({ success: false, message: 'Cannot modify sale-linked income. This is system-generated.' });
+    }
+    const allowed = { title: req.body.title, source: req.body.source, amount: req.body.amount, date: req.body.date };
+    Object.assign(income, allowed);
+    await income.save();
+    res.json({ success: true, data: income });
+  }
   catch (error) { res.status(422).json({ success: false, message: error.message }); }
 };
 const deleteIncome = async (req, res) => {
-  try { const income = await Income.findById(req.params.id); if (!income) return res.status(404).json({ success: false, message: 'Income not found' }); if (income.referenceType !== 'manual') return res.status(409).json({ success: false, message: 'Sale-linked income is read-only' }); await income.deleteOne(); res.json({ success: true }); }
+  try {
+    const income = await Income.findById(req.params.id);
+    if (!income) return res.status(404).json({ success: false, message: 'Income not found' });
+    if (income.referenceType !== 'manual') {
+      return res.status(403).json({ success: false, message: 'Cannot modify sale-linked income. This is system-generated.' });
+    }
+    await income.deleteOne();
+    res.json({ success: true });
+  }
   catch (error) { res.status(500).json({ success: false, message: 'Server error deleting income' }); }
 };
 

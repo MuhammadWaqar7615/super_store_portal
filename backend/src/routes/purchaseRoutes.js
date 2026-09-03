@@ -4,10 +4,11 @@ const { protect } = require('../middleware/authMiddleware');
 const { authorizeRoles } = require('../middleware/roleMiddleware');
 
 const router = express.Router();
-const adminOnly = [protect, authorizeRoles('Admin', 'Store_Manager')];
+const purchaseRead = [protect, authorizeRoles('Admin', 'Store_Manager', 'Accounts/Finance', 'Auditor')];
+const purchaseWrite = [protect, authorizeRoles('Admin', 'Store_Manager')];
 
-router.get('/', ...adminOnly, getPurchases);
-router.post('/', ...adminOnly, createPurchase);
-router.get('/:id', ...adminOnly, getPurchaseById);
+router.get('/', ...purchaseRead, getPurchases);
+router.post('/', ...purchaseWrite, createPurchase);
+router.get('/:id', ...purchaseRead, getPurchaseById);
 
 module.exports = router;

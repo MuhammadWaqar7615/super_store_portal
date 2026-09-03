@@ -15,6 +15,7 @@ import Users from '../pages/Users';
 import Expenses from '../pages/Expenses';
 import Income from '../pages/Income';
 import Reports from '../pages/Reports';
+import AccountantDashboard from '../pages/AccountantDashboard';
 import Products from '../pages/Products';
 import Inventory from '../pages/Inventory';
 import POS from '../pages/POS';
@@ -34,20 +35,21 @@ const AppRoutes = () => {
       <Route path="/login" element={<Login />} />
 
       {/* Layout wrapper for authenticated routes */}
-      <Route element={<PrivateRoute allowedRoles={['Admin', 'Store_Manager', 'Cashier']}><AdminLayout /></PrivateRoute>}>
+      <Route element={<PrivateRoute allowedRoles={['Admin', 'Store_Manager', 'Cashier', 'Accounts/Finance']}><AdminLayout /></PrivateRoute>}>
+        <Route path="/accountant-dashboard" element={<PrivateRoute allowedRoles={['Admin', 'Accounts/Finance']}><AccountantDashboard /></PrivateRoute>} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/categories" element={<PrivateRoute allowedRoles={['Admin', 'Store_Manager', 'Cashier']}><Categories /></PrivateRoute>} />
         <Route path="/suppliers" element={<PrivateRoute allowedRoles={['Admin', 'Store_Manager']}><Suppliers /></PrivateRoute>} />
-        <Route path="/purchases" element={<PrivateRoute allowedRoles={['Admin', 'Store_Manager']}><Purchases /></PrivateRoute>} />
+        <Route path="/purchases" element={<PrivateRoute allowedRoles={['Admin', 'Store_Manager', 'Accounts/Finance', 'Auditor']}><Purchases /></PrivateRoute>} />
         <Route path="/users" element={<PrivateRoute allowedRoles={['Admin']}><Users /></PrivateRoute>} />
-        <Route path="/expenses" element={<PrivateRoute allowedRoles={['Admin', 'Store_Manager']}><Expenses /></PrivateRoute>} />
-        <Route path="/income" element={<PrivateRoute allowedRoles={['Admin', 'Store_Manager']}><Income /></PrivateRoute>} />
-        <Route path="/reports" element={<PrivateRoute allowedRoles={['Admin']}><Reports /></PrivateRoute>} />
+        <Route path="/expenses" element={<PrivateRoute allowedRoles={['Admin', 'Store_Manager', 'Accounts/Finance', 'Auditor']}><Expenses /></PrivateRoute>} />
+        <Route path="/income" element={<PrivateRoute allowedRoles={['Admin', 'Store_Manager', 'Accounts/Finance', 'Auditor']}><Income /></PrivateRoute>} />
+        <Route path="/reports" element={<PrivateRoute allowedRoles={['Admin', 'Accounts/Finance', 'Auditor']}><Reports /></PrivateRoute>} />
         <Route path="/products" element={<PrivateRoute allowedRoles={['Admin', 'Store_Manager', 'Cashier']}><Products /></PrivateRoute>} />
         <Route path="/customers" element={<PrivateRoute allowedRoles={['Admin', 'Store_Manager', 'Cashier']}><RegisteredCustomers /></PrivateRoute>} />
         <Route path="/inventory" element={<PrivateRoute allowedRoles={['Admin', 'Store_Manager']}><Inventory /></PrivateRoute>} />
         <Route path="/pos" element={<PrivateRoute allowedRoles={['Admin', 'Cashier']}><POS /></PrivateRoute>} />
-        <Route path="/sales" element={<PrivateRoute allowedRoles={['Admin', 'Store_Manager', 'Cashier']}><Receipts /></PrivateRoute>} />
+        <Route path="/sales" element={<PrivateRoute allowedRoles={['Admin', 'Store_Manager', 'Cashier', 'Accounts/Finance', 'Auditor']}><Receipts /></PrivateRoute>} />
         <Route path="/receipts" element={<PrivateRoute allowedRoles={['Admin', 'Store_Manager', 'Cashier']}><Receipts /></PrivateRoute>} />
       </Route>
 

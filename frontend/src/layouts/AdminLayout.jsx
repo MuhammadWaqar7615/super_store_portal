@@ -27,6 +27,7 @@ const AdminLayout = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const isStoreManager = user?.role === 'Store_Manager';
+  const isFinance = user?.role === 'Accounts/Finance';
   const isPOS = location.pathname === '/pos';
 
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -43,7 +44,16 @@ const AdminLayout = () => {
     }
   };
 
-  const navItems = [
+  const financeNavItems = [
+    { name: 'Dashboard (Financial)', path: '/accountant-dashboard', icon: <LayoutDashboard size={20} /> },
+    { name: 'Expenses', path: '/expenses', icon: <Receipt size={20} /> },
+    { name: 'Income', path: '/income', icon: <TrendingUp size={20} /> },
+    { name: 'Reports', path: '/reports', icon: <BarChart3 size={20} /> },
+    { name: 'Sales', path: '/sales', icon: <ReceiptText size={20} /> },
+    { name: 'Purchases', path: '/purchases', icon: <PackagePlus size={20} /> },
+  ];
+
+  const navItems = isFinance ? [] : [
     { name: 'Dashboard', path: '/dashboard', icon: <LayoutDashboard size={20} /> },
     ...(user?.role === 'Cashier' ? [{ name: 'POS', path: '/pos', icon: <MonitorPlay size={20} /> }] : []),
     { name: 'Sales', path: '/sales', icon: <ReceiptText size={20} /> },
@@ -125,7 +135,7 @@ const AdminLayout = () => {
             </Link>
           ))}
 
-          {(user?.role === 'Admin' || isStoreManager) && (
+          {!isFinance && (user?.role === 'Admin' || isStoreManager) && (
             <div className="pt-4 pb-1">
               <div className={`overflow-hidden transition-all duration-300 ${isCollapsed ? 'h-0 opacity-0' : 'h-auto opacity-100 px-3 mb-2'}`}>
                 <p className="text-[11px] uppercase text-gray-500 font-semibold tracking-wider">Operations</p>
@@ -181,6 +191,30 @@ const AdminLayout = () => {
                   </Link>
                 </>
               )}
+            </div>
+          )}
+
+          {isFinance && (
+            <div className="pt-4 pb-1">
+              <div className={`overflow-hidden transition-all duration-300 ${isCollapsed ? 'h-0 opacity-0' : 'h-auto opacity-100 px-3 mb-2'}`}>
+                <p className="text-[11px] uppercase text-gray-500 font-semibold tracking-wider">Finance</p>
+              </div>
+              {financeNavItems.map((item) => (
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  onClick={() => { if (window.innerWidth < 1024) setIsMobileOpen(false); }}
+                  className={`flex items-center ${isCollapsed ? 'justify-center w-10 h-10 mx-auto rounded-full mt-1' : 'px-3 py-2.5 rounded-xl mt-1'} transition-all group ${location.pathname === item.path ? 'bg-[#1a2321] text-[#10b981]' : 'text-gray-300 hover:bg-[#1a1a1a] hover:text-white'}`}
+                  title={isCollapsed ? item.name : ""}
+                >
+                  <div className="flex-shrink-0 flex items-center justify-center w-6 h-6">
+                    {React.cloneElement(item.icon, { size: 18 })}
+                  </div>
+                  <div className={`overflow-hidden transition-all duration-300 whitespace-nowrap ${isCollapsed ? 'w-0 opacity-0' : 'w-auto opacity-100 ml-3'}`}>
+                    <span className="font-medium text-[14px]">{item.name}</span>
+                  </div>
+                </Link>
+              ))}
             </div>
           )}
         </nav>

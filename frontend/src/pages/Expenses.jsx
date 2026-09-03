@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Receipt } from 'lucide-react';
 import { createExpense, deleteExpense, getExpenses, updateExpense } from '../services/financeService';
 
-const categories = ['Electricity', 'Rent', 'Internet', 'Maintenance', 'Marketing', 'Transport', 'Other'];
+const categories = ['Electricity', 'Rent', 'Salary', 'Internet', 'Maintenance', 'Marketing', 'Transport', 'Stationery', 'Utilities', 'Other'];
 const blank = { title: '', category: 'Other', amount: '', description: '', paymentMethod: '', date: new Date().toISOString().slice(0, 10) };
 
 const Expenses = () => {
