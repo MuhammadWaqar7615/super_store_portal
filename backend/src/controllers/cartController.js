@@ -5,9 +5,107 @@ const Payment = require('../models/Payment');
 const { completeSaleInTransaction } = require('../services/saleService');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY || 'sk_test_dummy');
 
+const consolidateSubmittedCarts = async () => {
+  const carts = await Cart.find({
+    status: 'submitted',
+    expiresAt: { $gt: new Date() }
+  }).sort({ submittedAt: 1, createdAt: 1 });
+
+  const primaryCarts = new Map();
+  for (const cart of carts) {
+    const customerKey = cart.customerId.toString();
+    const primaryCart = primaryCarts.get(customerKey);
+
+    if (!primaryCart) {
+      primaryCarts.set(customerKey, cart);
+      continue;
+    }
+
+    for (const item of cart.items) {
+      const existingItem = primaryCart.items.find(existing => existing.productId.toString() === item.productId.toString());
+      if (existingItem) {
+        existingItem.quantity += item.quantity;
+        existingItem.productName = item.productName;
+        existingItem.unitPriceSnapshot = item.unitPriceSnapshot;
+      } else {
+        primaryCart.items.push(item.toObject ? item.toObject() : item);
+      }
+    }
+
+    primaryCart.markModified('items');
+    await primaryCart.save();
+    await Cart.deleteOne({ _id: cart._id });
+  }
+
+  return [...primaryCarts.values()].map(cart => cart._id);
+};
+
+exports.submitCart = async (req, res) => {
+  try {
+    if (req.user.role) {
+      return res.status(403).json({ success: false, message: 'Customer access required' });
+    }
+
+    const { items } = req.body;
+    if (!Array.isArray(items) || items.length === 0) {
+      return res.status(400).json({ success: false, message: 'Cart is empty' });
+    }
+
+    const submittedItems = [];
+    for (const item of items) {
+      const product = await Product.findById(item.productId);
+      const quantity = Number(item.quantity);
+      if (!product || !product.isActive || !Number.isInteger(quantity) || quantity < 1) {
+        return res.status(400).json({ success: false, message: 'Cart contains an invalid product or quantity' });
+      }
+
+      submittedItems.push({
+        productId: product._id,
+        productName: product.name,
+        quantity,
+        unitPriceSnapshot: product.sellingPrice
+      });
+    }
+
+    const existingCart = await Cart.findOne({
+      customerId: req.user._id,
+      status: 'submitted',
+      expiresAt: { $gt: new Date() }
+    }).sort({ submittedAt: 1 });
+
+    if (existingCart) {
+      for (const newItem of submittedItems) {
+        const existingItem = existingCart.items.find(item => item.productId.toString() === newItem.productId.toString());
+        if (existingItem) {
+          existingItem.quantity += newItem.quantity;
+          existingItem.productName = newItem.productName;
+          existingItem.unitPriceSnapshot = newItem.unitPriceSnapshot;
+        } else {
+          existingCart.items.push(newItem);
+        }
+      }
+      existingCart.markModified('items');
+      await existingCart.save();
+      return res.status(200).json({ success: true, data: existingCart, merged: true });
+    }
+
+    const cart = await Cart.create({
+      customerId: req.user._id,
+      items: submittedItems,
+      status: 'submitted',
+      submittedAt: new Date()
+    });
+    res.status(201).json({ success: true, data: cart, merged: false });
+  } catch (error) {
+    console.error('submitCart error:', error);
+    res.status(500).json({ success: false, message: 'Unable to submit cart' });
+  }
+};
+
 exports.getPendingCarts = async (req, res) => {
   try {
     console.log('[DEBUG] getPendingCarts called by user:', req.user?._id);
+    await consolidateSubmittedCarts();
     const carts = await Cart.find({ status: 'submitted' })
       .populate('customerId', 'name phone email')
       .sort({ submittedAt: 1 });
@@ -154,5 +252,22 @@ exports.finalizeCart = async (req, res) => {
   } catch (error) {
     console.error('finalizeCart error:', error);
     res.status(500).json({ success: false, message: 'Server error: ' + error.message });
+  }
+};
+
+exports.rejectCart = async (req, res) => {
+  try {
+    const cart = await Cart.findOneAndUpdate(
+      { _id: req.params.id, status: 'submitted' },
+      { status: 'cancelled' },
+      { new: true }
+    );
+    if (!cart) {
+      return res.status(400).json({ success: false, message: 'This cart has already been processed or cancelled.' });
+    }
+    res.status(200).json({ success: true, data: cart });
+  } catch (error) {
+    console.error('rejectCart error:', error);
+    res.status(500).json({ success: false, message: 'Unable to reject cart' });
   }
 };

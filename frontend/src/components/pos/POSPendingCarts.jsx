@@ -7,6 +7,7 @@ const POSPendingCarts = ({ onFinalizeSuccess, onBadgeUpdate }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [finalizingId, setFinalizingId] = useState(null);
+  const [rejectingId, setRejectingId] = useState(null);
 
   const fetchPendingCarts = async () => {
     try {
@@ -46,6 +47,21 @@ const POSPendingCarts = ({ onFinalizeSuccess, onBadgeUpdate }) => {
       if (onBadgeUpdate) onBadgeUpdate(pendingCarts.length - 1);
     } finally {
       setFinalizingId(null);
+    }
+  };
+
+  const handleReject = async (cart) => {
+    if (!window.confirm(`Reject ${cart.customerId?.name || 'this customer'}'s pending bill?`)) return;
+    setRejectingId(cart._id);
+    try {
+      await api.post(`/cart/${cart._id}/reject`);
+      setPendingCarts(prev => prev.filter(c => c._id !== cart._id));
+      if (onBadgeUpdate) onBadgeUpdate(Math.max(0, pendingCarts.length - 1));
+    } catch (err) {
+      alert(err.response?.data?.message || 'Failed to reject cart.');
+      fetchPendingCarts();
+    } finally {
+      setRejectingId(null);
     }
   };
 
@@ -110,10 +126,17 @@ const POSPendingCarts = ({ onFinalizeSuccess, onBadgeUpdate }) => {
                   </div>
                 </div>
 
-                <div className="flex justify-end pt-3 border-t border-slate-100">
+                <div className="flex justify-end gap-2 pt-3 border-t border-slate-100">
+                  <button
+                    onClick={() => handleReject(cart)}
+                    disabled={finalizingId === cart._id || rejectingId === cart._id}
+                    className="flex items-center space-x-2 px-4 py-2 bg-red-600/80 hover:bg-red-700 text-white rounded-md text-[14px] font-medium transition-colors disabled:opacity-50"
+                  >
+                    {rejectingId === cart._id ? 'Rejecting...' : <><XCircle className="w-4 h-4" /><span>Reject Bill</span></>}
+                  </button>
                   <button
                     onClick={() => handleFinalize(cart)}
-                    disabled={finalizingId === cart._id}
+                    disabled={finalizingId === cart._id || rejectingId === cart._id}
                     className="flex items-center space-x-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-[14px] font-medium transition-colors disabled:opacity-50"
                   >
                     {finalizingId === cart._id ? (
