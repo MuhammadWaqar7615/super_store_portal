@@ -25,8 +25,8 @@ const seedDatabase = async () => {
 
     // Create Admin and Cashier
     await User.create([
-      { email: 'admin@superstore.com', password, role: 'Admin' },
-      { email: 'cashier@superstore.com', password, role: 'Cashier' }
+      { name: 'Store Admin', email: 'admin@superstore.com', password, role: 'Admin' },
+      { name: 'Store Cashier', email: 'cashier@superstore.com', password, role: 'Cashier' }
     ]);
     console.log('Admin and Cashier seeded');
 

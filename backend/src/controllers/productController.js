@@ -1,11 +1,23 @@
 const Product = require('../models/Product');
 
-// @desc    Get all products
+// @desc    Get all products (with optional filters by category or supplier)
 // @route   GET /api/products
 // @access  Public (or protected)
 const getProducts = async (req, res) => {
   try {
-    const products = await Product.find({}).populate('category', 'name');
+    const filter = {};
+    if (req.query.category) {
+      filter.category = req.query.category;
+    }
+    if (req.query.supplier) {
+      filter.supplier = req.query.supplier;
+    }
+
+    const products = await Product.find(filter)
+      .populate('category', 'name')
+      .populate('supplier', 'name email phone contactPerson')
+      .sort({ createdAt: -1 });
+
     res.json({ success: true, data: products });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Server error' });
@@ -17,7 +29,9 @@ const getProducts = async (req, res) => {
 // @access  Public
 const getProductById = async (req, res) => {
   try {
-    const product = await Product.findById(req.params.id).populate('category', 'name');
+    const product = await Product.findById(req.params.id)
+      .populate('category', 'name')
+      .populate('supplier', 'name email phone contactPerson address');
     if (!product) return res.status(404).json({ success: false, message: 'Product not found' });
     res.json({ success: true, data: product });
   } catch (error) {
@@ -34,9 +48,19 @@ const createProduct = async (req, res) => {
     if (req.file) {
       productData.image = req.file.path;
     }
+    if (!productData.supplier || productData.supplier === 'null') {
+      return res.status(422).json({ success: false, message: 'Supplier is required' });
+    }
+    if (productData.supplier === '' || productData.supplier === 'null' || !productData.supplier) {
+      delete productData.supplier;
+    }
     const product = new Product(productData);
     const createdProduct = await product.save();
-    res.status(201).json({ success: true, data: createdProduct });
+    const populatedProduct = await Product.findById(createdProduct._id)
+      .populate('category', 'name')
+      .populate('supplier', 'name email phone contactPerson');
+
+    res.status(201).json({ success: true, data: populatedProduct });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
@@ -51,7 +75,13 @@ const updateProduct = async (req, res) => {
     if (req.file) {
       productData.image = req.file.path;
     }
-    const product = await Product.findByIdAndUpdate(req.params.id, productData, { new: true, runValidators: true });
+    if (productData.supplier === '' || productData.supplier === 'null') {
+      productData.supplier = null;
+    }
+    const product = await Product.findByIdAndUpdate(req.params.id, productData, { new: true, runValidators: true })
+      .populate('category', 'name')
+      .populate('supplier', 'name email phone contactPerson');
+
     if (!product) return res.status(404).json({ success: false, message: 'Product not found' });
     res.json({ success: true, data: product });
   } catch (error) {

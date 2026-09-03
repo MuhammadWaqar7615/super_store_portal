@@ -80,7 +80,7 @@ const Dashboard = () => {
 
   if (!data) return null;
 
-  const { metrics, recentSales, lowStockProducts } = data;
+  const { metrics, recentSales, lowStockProducts, recentPurchases, recentExpenses, topSellingProducts } = data;
 
   return (
     <div className="min-h-[100vh] bg-[#064e3b] p-8 -m-6" style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}>
@@ -130,6 +130,21 @@ const Dashboard = () => {
           value={`Rs. ${metrics.totalExpenses.toLocaleString()}`}
           icon={<svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" /></svg>}
         />
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-10">
+        <div className="rounded-2xl bg-white/10 border border-white/15 p-5">
+          <h2 className="font-semibold text-white mb-4">Top-selling products</h2>
+          {topSellingProducts?.map(product => <div key={product._id} className="flex justify-between text-sm text-gray-300 py-2 border-b border-white/10"><span>{product.productName}</span><span>{product.quantity} sold</span></div>)}
+        </div>
+        <div className="rounded-2xl bg-white/10 border border-white/15 p-5">
+          <h2 className="font-semibold text-white mb-4">Recent purchases</h2>
+          {recentPurchases?.map(purchase => <div key={purchase._id} className="flex justify-between text-sm text-gray-300 py-2 border-b border-white/10"><span>{purchase.supplierId?.name || 'Supplier'}</span><span>Rs. {purchase.totalAmount?.toLocaleString()}</span></div>)}
+        </div>
+        <div className="rounded-2xl bg-white/10 border border-white/15 p-5">
+          <h2 className="font-semibold text-white mb-4">Recent expenses</h2>
+          {recentExpenses?.map(expense => <div key={expense._id} className="flex justify-between text-sm text-gray-300 py-2 border-b border-white/10"><span>{expense.title}</span><span>Rs. {expense.amount?.toLocaleString()}</span></div>)}
+        </div>
       </div>
 
       {/* Lists section */}

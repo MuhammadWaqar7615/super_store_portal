@@ -2,15 +2,21 @@ import React, { useState } from 'react';
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
-import { 
-  LayoutDashboard, 
-  MonitorPlay, 
-  ReceiptText, 
-  Tags, 
-  Package, 
-  Warehouse, 
-  LogOut, 
-  ChevronLeft, 
+import {
+  LayoutDashboard,
+  MonitorPlay,
+  ReceiptText,
+  Tags,
+  Package,
+  Warehouse,
+  Truck,
+  PackagePlus,
+  UsersRound,
+  Receipt,
+  TrendingUp,
+  BarChart3,
+  LogOut,
+  ChevronLeft,
   Menu,
   User
 } from 'lucide-react';
@@ -20,7 +26,7 @@ const AdminLayout = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const isPOS = location.pathname === '/pos';
-  
+
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
 
@@ -37,19 +43,25 @@ const AdminLayout = () => {
 
   const navItems = [
     { name: 'Dashboard', path: '/dashboard', icon: <LayoutDashboard size={20} /> },
-    { name: 'POS', path: '/pos', icon: <MonitorPlay size={20} /> },
+    ...(user?.role === 'Cashier' ? [{ name: 'POS', path: '/pos', icon: <MonitorPlay size={20} /> }] : []),
     { name: 'Receipts', path: '/receipts', icon: <ReceiptText size={20} /> },
   ];
 
   const adminNavItems = [
     { name: 'Categories', path: '/categories', icon: <Tags size={20} /> },
+    { name: 'Suppliers', path: '/suppliers', icon: <Truck size={20} /> },
+    { name: 'Purchases', path: '/purchases', icon: <PackagePlus size={20} /> },
+    { name: 'Users', path: '/users', icon: <UsersRound size={20} /> },
+    { name: 'Expenses', path: '/expenses', icon: <Receipt size={20} /> },
+    { name: 'Income', path: '/income', icon: <TrendingUp size={20} /> },
+    { name: 'Reports', path: '/reports', icon: <BarChart3 size={20} /> },
     { name: 'Products', path: '/products', icon: <Package size={20} /> },
     { name: 'Inventory', path: '/inventory', icon: <Warehouse size={20} /> },
   ];
 
   return (
     <div className="flex h-screen bg-[#064e3b] relative overflow-hidden">
-      
+
       {/* Mobile Top Bar */}
       <div className="lg:hidden absolute top-0 left-0 right-0 h-14 bg-black/20 backdrop-blur-md border-b border-white/10 flex items-center px-4 z-30">
         <button onClick={() => setIsMobileOpen(true)} className="text-white p-1">
@@ -59,7 +71,7 @@ const AdminLayout = () => {
 
       {/* Mobile Overlay Backdrop */}
       {isMobileOpen && (
-        <div 
+        <div
           className="lg:hidden fixed inset-0 bg-black/60 z-40 backdrop-blur-sm"
           onClick={() => setIsMobileOpen(false)}
         />
@@ -74,7 +86,7 @@ const AdminLayout = () => {
       `}>
         {/* Top Header */}
         <div className="h-16 flex items-center px-3">
-          <button 
+          <button
             onClick={() => {
               if (window.innerWidth < 1024) {
                 setIsMobileOpen(false);
@@ -86,7 +98,7 @@ const AdminLayout = () => {
           >
             <Menu size={20} />
           </button>
-          
+
           <div className={`overflow-hidden transition-all duration-300 whitespace-nowrap ${isCollapsed ? 'w-0 opacity-0' : 'w-auto opacity-100 ml-2'}`}>
             <span className="text-[18px] font-medium tracking-wide">Super Store</span>
           </div>
@@ -95,9 +107,9 @@ const AdminLayout = () => {
         {/* Navigation */}
         <nav className="flex-1 px-3 py-2 space-y-1 overflow-y-auto overflow-x-hidden hide-scrollbar">
           {navItems.map((item) => (
-            <Link 
+            <Link
               key={item.path}
-              to={item.path} 
+              to={item.path}
               onClick={() => { if (window.innerWidth < 1024) setIsMobileOpen(false); }}
               className={`flex items-center ${isCollapsed ? 'justify-center w-10 h-10 mx-auto rounded-full' : 'px-3 py-2.5 rounded-xl'} transition-all group ${location.pathname === item.path ? 'bg-[#1a2321] text-[#10b981]' : 'text-gray-300 hover:bg-[#1a1a1a] hover:text-white'}`}
               title={isCollapsed ? item.name : ""}
@@ -116,11 +128,11 @@ const AdminLayout = () => {
               <div className={`overflow-hidden transition-all duration-300 ${isCollapsed ? 'h-0 opacity-0' : 'h-auto opacity-100 px-3 mb-2'}`}>
                 <p className="text-[11px] uppercase text-gray-500 font-semibold tracking-wider">Admin</p>
               </div>
-              
+
               {adminNavItems.map((item) => (
-                <Link 
+                <Link
                   key={item.path}
-                  to={item.path} 
+                  to={item.path}
                   onClick={() => { if (window.innerWidth < 1024) setIsMobileOpen(false); }}
                   className={`flex items-center ${isCollapsed ? 'justify-center w-10 h-10 mx-auto rounded-full mt-1' : 'px-3 py-2.5 rounded-xl mt-1'} transition-all group ${location.pathname === item.path ? 'bg-[#1a2321] text-[#10b981]' : 'text-gray-300 hover:bg-[#1a1a1a] hover:text-white'}`}
                   title={isCollapsed ? item.name : ""}
@@ -139,27 +151,27 @@ const AdminLayout = () => {
 
         {/* Footer (Profile & Logout) */}
         <div className="p-3 mb-2">
-           <div className={`flex items-center ${isCollapsed ? 'justify-center w-10 h-10 mx-auto rounded-full' : 'px-2 py-2 rounded-xl'} hover:bg-[#1a1a1a] cursor-pointer transition-all`}>
-              <div className="w-7 h-7 flex-shrink-0 rounded-full bg-[#10b981]/20 text-[#10b981] flex items-center justify-center text-[13px] font-bold">
-                 {user?.email?.[0].toUpperCase() || 'U'}
-              </div>
-              <div className={`overflow-hidden transition-all duration-300 whitespace-nowrap ${isCollapsed ? 'w-0 opacity-0' : 'w-auto opacity-100 ml-3'}`}>
-                <p className="text-[14px] font-medium text-white truncate max-w-[150px]">{user?.email}</p>
-              </div>
-           </div>
-           
-           <button 
-             onClick={handleLogout}
-             className={`mt-1 w-full flex items-center ${isCollapsed ? 'justify-center w-10 h-10 mx-auto rounded-full' : 'px-2 py-2 rounded-xl'} text-red-400 hover:bg-red-500/10 transition-all`}
-             title="Logout"
-           >
-              <div className="w-7 h-7 flex-shrink-0 flex items-center justify-center">
-                <LogOut size={18} />
-              </div>
-              <div className={`overflow-hidden transition-all duration-300 whitespace-nowrap ${isCollapsed ? 'w-0 opacity-0' : 'w-auto opacity-100 ml-3 text-left'}`}>
-                <span className="font-medium text-[14px]">Logout</span>
-              </div>
-           </button>
+          <div className={`flex items-center ${isCollapsed ? 'justify-center w-10 h-10 mx-auto rounded-full' : 'px-2 py-2 rounded-xl'} hover:bg-[#1a1a1a] cursor-pointer transition-all`}>
+            <div className="w-7 h-7 flex-shrink-0 rounded-full bg-[#10b981]/20 text-[#10b981] flex items-center justify-center text-[13px] font-bold">
+              {user?.email?.[0].toUpperCase() || 'U'}
+            </div>
+            <div className={`overflow-hidden transition-all duration-300 whitespace-nowrap ${isCollapsed ? 'w-0 opacity-0' : 'w-auto opacity-100 ml-3'}`}>
+              <p className="text-[14px] font-medium text-white truncate max-w-[150px]">{user?.email}</p>
+            </div>
+          </div>
+
+          <button
+            onClick={handleLogout}
+            className={`mt-1 w-full flex items-center ${isCollapsed ? 'justify-center w-10 h-10 mx-auto rounded-full' : 'px-2 py-2 rounded-xl'} text-red-400 hover:bg-red-500/10 transition-all`}
+            title="Logout"
+          >
+            <div className="w-7 h-7 flex-shrink-0 flex items-center justify-center">
+              <LogOut size={18} />
+            </div>
+            <div className={`overflow-hidden transition-all duration-300 whitespace-nowrap ${isCollapsed ? 'w-0 opacity-0' : 'w-auto opacity-100 ml-3 text-left'}`}>
+              <span className="font-medium text-[14px]">Logout</span>
+            </div>
+          </button>
         </div>
       </aside>
 

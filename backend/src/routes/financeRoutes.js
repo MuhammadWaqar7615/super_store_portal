@@ -1,0 +1,15 @@
+const express = require('express');
+const controller = require('../controllers/financeController');
+const { protect } = require('../middleware/authMiddleware');
+const { authorizeRoles } = require('../middleware/roleMiddleware');
+const router = express.Router();
+const adminOnly = [protect, authorizeRoles('Admin')];
+router.get('/expenses', ...adminOnly, controller.listExpenses);
+router.post('/expenses', ...adminOnly, controller.createExpense);
+router.put('/expenses/:id', ...adminOnly, controller.updateExpense);
+router.delete('/expenses/:id', ...adminOnly, controller.deleteExpense);
+router.get('/income', ...adminOnly, controller.listIncome);
+router.post('/income', ...adminOnly, controller.createIncome);
+router.put('/income/:id', ...adminOnly, controller.updateIncome);
+router.delete('/income/:id', ...adminOnly, controller.deleteIncome);
+module.exports = router;

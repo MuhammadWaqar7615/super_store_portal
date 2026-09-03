@@ -1,6 +1,11 @@
 const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    default: 'Staff User',
+    trim: true
+  },
   email: {
     type: String,
     required: true,
@@ -16,6 +21,10 @@ const userSchema = new mongoose.Schema({
     type: String,
     enum: ['Admin', 'Cashier'],
     required: true,
+  },
+  isActive: {
+    type: Boolean,
+    default: true
   }
 }, { timestamps: true });
 

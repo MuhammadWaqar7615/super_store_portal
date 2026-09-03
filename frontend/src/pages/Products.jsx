@@ -7,6 +7,7 @@ const Products = () => {
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [suppliers, setSuppliers] = useState([]);
   const [loading, setLoading] = useState(true);
   
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -15,10 +16,12 @@ const Products = () => {
   // Filters
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
+  const [supplierFilter, setSupplierFilter] = useState('');
 
   useEffect(() => {
     fetchProducts();
     fetchCategories();
+    fetchSuppliers();
   }, []);
 
   useEffect(() => {
@@ -27,16 +30,19 @@ const Products = () => {
       filtered = filtered.filter(p => p.name.toLowerCase().includes(searchTerm.toLowerCase()));
     }
     if (categoryFilter) {
-      filtered = filtered.filter(p => p.category?._id === categoryFilter);
+      filtered = filtered.filter(p => (p.category?._id || p.category) === categoryFilter);
+    }
+    if (supplierFilter) {
+      filtered = filtered.filter(p => (p.supplier?._id || p.supplier) === supplierFilter);
     }
     setFilteredProducts(filtered);
-  }, [products, searchTerm, categoryFilter]);
+  }, [products, searchTerm, categoryFilter, supplierFilter]);
 
   const fetchProducts = async () => {
     try {
       setLoading(true);
       const { data } = await api.get('/products');
-      setProducts(data.data);
+      setProducts(data.data || []);
     } catch (error) {
       console.error('Failed to fetch products:', error);
     } finally {
@@ -47,7 +53,16 @@ const Products = () => {
   const fetchCategories = async () => {
     try {
       const { data } = await api.get('/categories');
-      setCategories(data.data);
+      setCategories(data.data || []);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const fetchSuppliers = async () => {
+    try {
+      const { data } = await api.get('/suppliers');
+      setSuppliers(data.data || []);
     } catch (err) {
       console.error(err);
     }
@@ -92,9 +107,9 @@ const Products = () => {
       <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-8 gap-4">
         <div>
           <h1 className="text-4xl font-extrabold text-white tracking-tight">Products</h1>
-          <p className="text-gray-400 mt-2">Manage your catalog and stock</p>
+          <p className="text-gray-400 mt-2">Manage your catalog, suppliers, and stock</p>
         </div>
-        <button onClick={openAddModal} className="bg-[#10b981] hover:bg-[#059669] text-white px-6 py-3 rounded-xl shadow-[0_0_15px_rgba(16,185,129,0.4)] transition-all font-medium flex items-center shrink-0">
+        <button onClick={openAddModal} className="bg-[#10b981] hover:bg-[#059669] text-white px-6 py-3 rounded-xl shadow-[0_0_15px_rgba(16,185,129,0.4)] transition-all font-medium flex items-center shrink-0 cursor-pointer">
           <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4"></path></svg>
           Add Product
         </button>
@@ -110,12 +125,20 @@ const Products = () => {
           onChange={(e) => setSearchTerm(e.target.value)}
         />
         <select 
-          className="bg-white/10 border border-white/20 rounded-xl px-4 py-2 text-white placeholder-gray-400 focus:outline-none md:w-64"
+          className="bg-white/10 border border-white/20 rounded-xl px-4 py-2 text-white placeholder-gray-400 focus:outline-none md:w-56"
           value={categoryFilter}
           onChange={(e) => setCategoryFilter(e.target.value)}
         >
           <option value="" className="text-black">All Categories</option>
           {categories.map(c => <option key={c._id} value={c._id} className="text-black">{c.name}</option>)}
+        </select>
+        <select 
+          className="bg-white/10 border border-white/20 rounded-xl px-4 py-2 text-white placeholder-gray-400 focus:outline-none md:w-56"
+          value={supplierFilter}
+          onChange={(e) => setSupplierFilter(e.target.value)}
+        >
+          <option value="" className="text-black">All Suppliers</option>
+          {suppliers.map(s => <option key={s._id} value={s._id} className="text-black">{s.name}</option>)}
         </select>
       </div>
 
@@ -133,7 +156,10 @@ const Products = () => {
       <ProductFormModal 
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onSuccess={fetchProducts}
+        onSuccess={() => {
+          fetchProducts();
+          fetchSuppliers();
+        }}
         productToEdit={productToEdit}
       />
     </div>

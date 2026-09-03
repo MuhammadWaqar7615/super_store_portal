@@ -1,6 +1,8 @@
+const mongoose = require('mongoose');
 const Sale = require('../models/Sale');
 const Product = require('../models/Product');
-const StockMovement = require('../models/StockMovement');
+const Payment = require('../models/Payment');
+const { completeSale, completeSaleInTransaction } = require('../services/saleService');
 
 const validateCart = async (req, res) => {
   try {
@@ -41,6 +43,7 @@ const validateCart = async (req, res) => {
 };
 
 const createSale = async (req, res) => {
+  const session = await mongoose.startSession();
   try {
     const { items, customerId, walkInCustomerName, walkInCustomerPhone, paymentStatus, stripePaymentIntentId } = req.body;
 
@@ -79,36 +82,50 @@ const createSale = async (req, res) => {
       items: validatedItems.map(({ productDoc, ...rest }) => rest), // remove productDoc before saving
       subtotal,
       total: subtotal,
-      paymentStatus,
-      // store stripe intent if needed, though schema doesn't currently have it
+      status: 'pending',
+      paymentStatus: 'pending'
     });
 
-    await sale.save();
-
-    // Now update stock and create movements
-    for (let item of validatedItems) {
-      const product = item.productDoc;
-      const previousStock = product.stockQuantity;
-      product.stockQuantity -= item.quantity;
-      await product.save();
-
-      await StockMovement.create({
-        productId: product._id,
-        type: 'SALE',
-        quantity: item.quantity,
-        previousStock,
-        newStock: product.stockQuantity,
+    let completedSale;
+    await session.withTransaction(async () => {
+      await sale.save({ session });
+      await Payment.create([{
+        amount: sale.total,
+        method: stripePaymentIntentId ? 'stripe' : 'cash',
         referenceType: 'SALE',
         referenceId: sale._id,
+        saleId: sale._id,
+        stripePaymentIntentId,
         createdBy: req.user._id,
-        reason: `POS Sale ${sale.invoiceNumber}`
-      });
-    }
+        status: 'pending'
+      }], { session });
+      completedSale = await completeSale(sale._id, session);
+    });
 
-    res.status(201).json({ success: true, data: sale });
+    res.status(201).json({ success: true, data: completedSale });
   } catch (error) {
     console.error('Create Sale Error:', error);
-    res.status(500).json({ success: false, message: 'Server error' });
+    res.status(error.statusCode || 500).json({ success: false, message: error.message || 'Server error' });
+  } finally {
+    await session.endSession();
+  }
+};
+
+const completeExistingSale = async (req, res) => {
+  try {
+    const saleOwnership = await Sale.findById(req.params.id).select('cashierId');
+    if (!saleOwnership) return res.status(404).json({ success: false, message: 'Sale not found' });
+    if (req.user.role === 'Cashier' && saleOwnership.cashierId?.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ success: false, message: 'Access denied' });
+    }
+    const sale = await completeSaleInTransaction(req.params.id);
+    res.json({ success: true, data: sale });
+  } catch (error) {
+    console.error('Complete Sale Error:', error);
+    res.status(error.statusCode || 500).json({
+      success: false,
+      message: error.message || 'Unable to complete sale'
+    });
   }
 };
 
@@ -141,4 +158,4 @@ const getSaleById = async (req, res) => {
   }
 };
 
-module.exports = { validateCart, createSale, getSales, getSaleById };
+module.exports = { validateCart, createSale, completeExistingSale, getSales, getSaleById };

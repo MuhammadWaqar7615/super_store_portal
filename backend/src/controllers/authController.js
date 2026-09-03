@@ -2,6 +2,8 @@ const bcrypt = require('bcrypt');
 const User = require('../models/User');
 const generateToken = require('../utils/generateToken');
 
+const hashPassword = (password) => bcrypt.hash(password, 10);
+
 // @desc    Auth user & get token
 // @route   POST /api/auth/login
 // @access  Public
@@ -11,7 +13,7 @@ const loginUser = async (req, res) => {
   try {
     const user = await User.findOne({ email });
 
-    if (user && (await bcrypt.compare(password, user.password))) {
+    if (user && user.isActive !== false && (await bcrypt.compare(password, user.password))) {
       res.json({
         success: true,
         data: {
@@ -53,4 +55,4 @@ const logoutUser = (req, res) => {
   res.json({ success: true, message: 'Logged out successfully' });
 };
 
-module.exports = { loginUser, getUserProfile, logoutUser };
+module.exports = { loginUser, getUserProfile, logoutUser, hashPassword };

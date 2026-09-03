@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 
 const purchaseSchema = new mongoose.Schema({
   supplierId: { type: mongoose.Schema.Types.ObjectId, ref: 'Supplier' },
+  createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   invoiceNumber: String,
   items: [{
     productId: { type: mongoose.Schema.Types.ObjectId, ref: 'Product' },

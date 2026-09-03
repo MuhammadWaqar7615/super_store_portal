@@ -4,6 +4,7 @@ const app = express();
 
 // Middleware
 app.use(cors());
+app.use('/api/webhooks', require('./routes/webhookRoutes'));
 app.use(express.json());
 
 // Basic health check route
@@ -21,6 +22,10 @@ app.use('/api/inventory', require('./routes/inventoryRoutes'));
 app.use('/api/sales', require('./routes/saleRoutes'));
 app.use('/api/payments', require('./routes/paymentRoutes'));
 app.use('/api/cart', require('./routes/cartRoutes'));
+app.use('/api/suppliers', require('./routes/supplierRoutes'));
+app.use('/api/purchases', require('./routes/purchaseRoutes'));
+app.use('/api/users', require('./routes/userRoutes'));
+app.use('/api', require('./routes/financeRoutes'));
 // 404 handler
 app.use((req, res, next) => {
   res.status(404).json({ success: false, message: 'Route not found' });

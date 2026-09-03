@@ -2,6 +2,7 @@ const Cart = require('../models/Cart');
 const Product = require('../models/Product');
 const Sale = require('../models/Sale');
 const Payment = require('../models/Payment');
+const { completeSaleInTransaction } = require('../services/saleService');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY || 'sk_test_dummy');
 
 exports.getPendingCarts = async (req, res) => {
@@ -18,6 +19,27 @@ exports.getPendingCarts = async (req, res) => {
   } catch (error) {
     console.error('getPendingCarts error:', error);
     res.status(500).json({ success: false, message: 'Server error' });
+  }
+};
+
+exports.completeFinalizedSale = async (req, res) => {
+  try {
+    if (req.user.role) {
+      return res.status(403).json({ success: false, message: 'Only the customer can complete this sale' });
+    }
+    const saleOwnership = await Sale.findById(req.params.saleId).select('customerId');
+    if (!saleOwnership) return res.status(404).json({ success: false, message: 'Sale not found' });
+    if (!saleOwnership.customerId || saleOwnership.customerId.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ success: false, message: 'Access denied' });
+    }
+    const sale = await completeSaleInTransaction(req.params.saleId);
+    res.json({ success: true, data: sale });
+  } catch (error) {
+    console.error('completeFinalizedSale error:', error);
+    res.status(error.statusCode || 500).json({
+      success: false,
+      message: error.message || 'Unable to complete sale'
+    });
   }
 };
 
@@ -111,12 +133,13 @@ exports.finalizeCart = async (req, res) => {
     // Create Payment doc
     const payment = new Payment({
       amount: sale.total,
-      method: 'STRIPE',
+      method: 'stripe',
       referenceType: 'SALE',
       referenceId: sale._id,
       saleId: sale._id, // For store app compatibility
       stripePaymentIntentId: paymentIntent.id,
       stripeClientSecret: paymentIntent.client_secret, // For store app compatibility
+      createdBy: req.user._id,
       status: 'pending' // using lowercase to match store app
     });
     await payment.save();

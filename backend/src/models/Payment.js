@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const paymentSchema = new mongoose.Schema({
   amount: { type: Number, required: true },
-  method: { type: String, enum: ['CASH', 'CARD', 'STRIPE', 'OTHER', 'stripe'], required: true },
+  method: { type: String, enum: ['stripe', 'cash'], required: true },
   referenceType: { type: String, enum: ['SALE', 'PURCHASE'] },
   referenceId: mongoose.Schema.Types.ObjectId,
   
@@ -11,12 +11,13 @@ const paymentSchema = new mongoose.Schema({
   stripeClientSecret: String,
   currency: { type: String, default: 'pkr' },
   transactionReference: String,
+  createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   webhookEventId: String,
   webhookProcessedAt: Date,
   paidAt: Date,
   
   stripePaymentIntentId: String,
-  status: { type: String, enum: ['PENDING', 'COMPLETED', 'FAILED', 'pending', 'processing', 'succeeded', 'failed', 'cancelled'], default: 'PENDING' }
+  status: { type: String, enum: ['pending', 'processing', 'succeeded', 'failed', 'refunded', 'PENDING', 'COMPLETED', 'FAILED', 'cancelled'], default: 'pending' }
 }, { timestamps: true, strict: false });
 
 module.exports = mongoose.model('Payment', paymentSchema);
