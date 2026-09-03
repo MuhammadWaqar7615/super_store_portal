@@ -28,7 +28,13 @@ const productSchema = new mongoose.Schema({
     required: true,
     min: 0,
   },
-  stockQuantity: {
+  inventoryQuantity: {
+    type: Number,
+    required: true,
+    default: 0,
+    min: 0,
+  },
+  storeQuantity: {
     type: Number,
     required: true,
     default: 0,
@@ -51,6 +57,15 @@ const productSchema = new mongoose.Schema({
     type: Boolean,
     default: true,
   }
-}, { timestamps: true });
+}, {
+  timestamps: true,
+  toJSON: { virtuals: true },
+  toObject: { virtuals: true }
+});
+
+// Keep the customer-facing product contract compatible with the previous stock field.
+productSchema.virtual('stockQuantity').get(function getStockQuantity() {
+  return this.storeQuantity;
+});
 
 module.exports = mongoose.model('Product', productSchema);

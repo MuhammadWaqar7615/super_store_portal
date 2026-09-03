@@ -55,16 +55,17 @@ const createPurchase = async (req, res) => {
 
       for (const item of purchaseItems) {
         const product = await Product.findById(item.productId).session(session);
-        const previousStock = product.stockQuantity;
-        product.stockQuantity += item.quantity;
+        const previousInventory = product.inventoryQuantity || 0;
+        product.inventoryQuantity = previousInventory + item.quantity;
         product.purchasePrice = item.unitCost;
         await product.save({ session });
         await StockMovement.create([{
           productId: product._id,
           type: 'PURCHASE',
           quantity: item.quantity,
-          previousStock,
-          newStock: product.stockQuantity,
+          previousStock: previousInventory,
+          newStock: product.inventoryQuantity,
+          location: 'INVENTORY',
           referenceType: 'PURCHASE',
           referenceId: purchase._id,
           createdBy: req.user._id,

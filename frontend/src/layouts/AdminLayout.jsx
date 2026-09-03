@@ -19,7 +19,8 @@ import {
   LogOut,
   ChevronLeft,
   Menu,
-  User
+  User,
+  Settings
 } from 'lucide-react';
 
 const AdminLayout = () => {
@@ -56,7 +57,7 @@ const AdminLayout = () => {
 
   const navItems = isFinance ? [] : user?.role === 'Inventory_Manager' ? [
     { name: 'Dashboard', path: '/dashboard', icon: <LayoutDashboard size={20} /> },
-    { name: 'Products', path: '/products', icon: <Package size={20} /> },
+    { name: 'Store Products', path: '/products', icon: <Package size={20} /> },
     { name: 'Categories', path: '/categories', icon: <Tags size={20} /> },
     { name: 'Suppliers', path: '/suppliers', icon: <Truck size={20} /> },
     { name: 'Purchases', path: '/purchases', icon: <PackagePlus size={20} /> },
@@ -67,7 +68,7 @@ const AdminLayout = () => {
     ...(user?.role === 'Cashier' ? [{ name: 'POS', path: '/pos', icon: <MonitorPlay size={20} /> }] : []),
     { name: 'Sales', path: '/sales', icon: <ReceiptText size={20} /> },
     { name: 'Receipts', path: '/receipts', icon: <Receipt size={20} /> },
-    { name: 'Products', path: '/products', icon: <Package size={20} /> },
+    { name: 'Store Products', path: '/products', icon: <Package size={20} /> },
     { name: 'Customers', path: '/customers', icon: <UserRound size={20} /> },
     { name: 'Categories', path: '/categories', icon: <Tags size={20} /> },
   ];
@@ -188,6 +189,15 @@ const AdminLayout = () => {
                     <div className={`overflow-hidden transition-all duration-300 whitespace-nowrap ${isCollapsed ? 'w-0 opacity-0' : 'w-auto opacity-100 ml-3'}`}>
                       <span className="font-medium text-[14px]">Users</span>
                     </div>
+                  </Link>
+                  <Link
+                    to="/settings"
+                    onClick={() => { if (window.innerWidth < 1024) setIsMobileOpen(false); }}
+                    className={`flex items-center ${isCollapsed ? 'justify-center w-10 h-10 mx-auto rounded-full mt-1' : 'px-3 py-2.5 rounded-xl mt-1'} transition-all group ${location.pathname === '/settings' ? 'bg-[#1a2321] text-[#10b981]' : 'text-gray-300 hover:bg-[#1a1a1a] hover:text-white'}`}
+                    title={isCollapsed ? 'Settings' : ''}
+                  >
+                    <div className="flex-shrink-0 flex items-center justify-center w-6 h-6"><Settings size={18} /></div>
+                    <div className={`overflow-hidden transition-all duration-300 whitespace-nowrap ${isCollapsed ? 'w-0 opacity-0' : 'w-auto opacity-100 ml-3'}`}><span className="font-medium text-[14px]">Settings</span></div>
                   </Link>
                   <Link
                     to="/reports"

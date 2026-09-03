@@ -1,4 +1,5 @@
 const Product = require('../models/Product');
+const StockMovement = require('../models/StockMovement');
 
 // @desc    Get all products (with optional filters by category or supplier)
 // @route   GET /api/products
@@ -11,6 +12,10 @@ const getProducts = async (req, res) => {
     }
     if (req.query.supplier) {
       filter.supplier = req.query.supplier;
+    }
+    if (req.userType === 'customer' || !req.user.role) {
+      filter.isActive = true;
+      filter.storeQuantity = { $gt: 0 };
     }
 
     const products = await Product.find(filter)
@@ -45,6 +50,9 @@ const getProductById = async (req, res) => {
 const createProduct = async (req, res) => {
   try {
     const productData = { ...req.body };
+    delete productData.stockQuantity;
+    delete productData.inventoryQuantity;
+    delete productData.storeQuantity;
     if (req.file) {
       productData.image = req.file.path;
     }
@@ -72,6 +80,9 @@ const createProduct = async (req, res) => {
 const updateProduct = async (req, res) => {
   try {
     const productData = { ...req.body };
+    delete productData.stockQuantity;
+    delete productData.inventoryQuantity;
+    delete productData.storeQuantity;
     if (req.file) {
       productData.image = req.file.path;
     }
@@ -96,6 +107,7 @@ const deleteProduct = async (req, res) => {
   try {
     const product = await Product.findByIdAndDelete(req.params.id);
     if (!product) return res.status(404).json({ success: false, message: 'Product not found' });
+    await StockMovement.deleteMany({ productId: product._id });
     res.json({ success: true, message: 'Product removed' });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Server error' });

@@ -4,6 +4,7 @@ import api from '../../services/api';
 const StockAdjustmentModal = ({ isOpen, onClose, onSuccess, product }) => {
   const [quantity, setQuantity] = useState('');
   const [reason, setReason] = useState('');
+  const [location, setLocation] = useState('INVENTORY');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -11,6 +12,7 @@ const StockAdjustmentModal = ({ isOpen, onClose, onSuccess, product }) => {
     if (isOpen) {
       setQuantity('');
       setReason('');
+      setLocation('INVENTORY');
       setError(null);
     }
   }, [isOpen]);
@@ -18,14 +20,27 @@ const StockAdjustmentModal = ({ isOpen, onClose, onSuccess, product }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!product) return;
+
+    const targetStock = Number(quantity);
+    const currentStock = location === 'STORE' ? (product.storeQuantity || 0) : (product.inventoryQuantity || 0);
+    if (!Number.isInteger(targetStock) || targetStock < 0) {
+      setError('Enter a whole number equal to or greater than zero.');
+      return;
+    }
+    if (targetStock === currentStock) {
+      setError('Enter a different stock quantity to make an adjustment.');
+      return;
+    }
     
     setLoading(true);
     setError(null);
     try {
       await api.post('/inventory/adjustment', {
         productId: product._id,
-        quantity: Number(quantity),
-        reason
+        // The API applies a delta; the form asks for the desired final stock.
+        quantity: targetStock - currentStock,
+        reason,
+        location
       });
       onSuccess();
       onClose();
@@ -38,8 +53,8 @@ const StockAdjustmentModal = ({ isOpen, onClose, onSuccess, product }) => {
 
   if (!isOpen || !product) return null;
 
-  const currentStock = product.stockQuantity;
-  const newStock = currentStock + Number(quantity || 0);
+  const currentStock = location === 'STORE' ? (product.storeQuantity || 0) : (product.inventoryQuantity || 0);
+  const newStock = quantity === '' ? currentStock : Number(quantity);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
@@ -65,16 +80,26 @@ const StockAdjustmentModal = ({ isOpen, onClose, onSuccess, product }) => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-1">Adjustment Quantity *</label>
+            <label className="block text-sm font-medium text-gray-300 mb-1">Stock Location *</label>
+            <select value={location} onChange={(e) => setLocation(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white">
+              <option value="INVENTORY" className="text-black">Inventory (Back Room)</option>
+              <option value="STORE" className="text-black">Store (Sales Floor)</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-1">New Stock Quantity *</label>
             <input
               type="number"
+              min="0"
+              step="1"
               required
               className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-[#10b981]/50 transition-all"
-              placeholder="+/- quantity"
+              placeholder={`Enter final quantity (current: ${currentStock})`}
               value={quantity}
               onChange={(e) => setQuantity(e.target.value)}
             />
-            <p className="text-xs text-gray-500 mt-1">Use negative values to reduce stock</p>
+            <p className="text-xs text-gray-500 mt-1">Enter the final quantity for this location.</p>
           </div>
           
           <div>
@@ -91,7 +116,7 @@ const StockAdjustmentModal = ({ isOpen, onClose, onSuccess, product }) => {
           
           <div className="flex justify-end space-x-3 pt-4 border-t border-white/10">
             <button type="button" onClick={onClose} className="px-5 py-2.5 rounded-xl text-gray-300 hover:bg-white/5 transition-colors font-medium">Cancel</button>
-            <button type="submit" disabled={loading || newStock < 0} className="px-5 py-2.5 rounded-xl bg-[#10b981] hover:bg-[#059669] text-white transition-all font-medium shadow-[0_0_15px_rgba(16,185,129,0.4)] disabled:opacity-50">
+            <button type="submit" disabled={loading || quantity === '' || !Number.isInteger(newStock) || newStock < 0 || newStock === currentStock} className="px-5 py-2.5 rounded-xl bg-[#10b981] hover:bg-[#059669] text-white transition-all font-medium shadow-[0_0_15px_rgba(16,185,129,0.4)] disabled:opacity-50">
               {loading ? 'Processing...' : 'Confirm'}
             </button>
           </div>

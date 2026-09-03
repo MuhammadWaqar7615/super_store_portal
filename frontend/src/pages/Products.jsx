@@ -85,15 +85,34 @@ const Products = () => {
   };
 
   const handleToggleActive = async (product) => {
+    const nextIsActive = !product.isActive;
+
+    // Update the visible row immediately instead of reloading the whole page/list.
+    setProducts(currentProducts => currentProducts.map(currentProduct => (
+      currentProduct._id === product._id
+        ? { ...currentProduct, isActive: nextIsActive }
+        : currentProduct
+    )));
+
     try {
       // Create FormData since the endpoint expects it for updates (multer)
       const data = new FormData();
-      data.append('isActive', !product.isActive);
+      data.append('isActive', nextIsActive);
       
-      await api.put(`/products/${product._id}`, data);
-      fetchProducts();
+      const response = await api.put(`/products/${product._id}`, data);
+      const updatedProduct = response.data?.data;
+      if (updatedProduct) {
+        setProducts(currentProducts => currentProducts.map(currentProduct => (
+          currentProduct._id === updatedProduct._id ? updatedProduct : currentProduct
+        )));
+      }
     } catch (error) {
-      console.error('Failed to toggle status');
+      setProducts(currentProducts => currentProducts.map(currentProduct => (
+        currentProduct._id === product._id
+          ? { ...currentProduct, isActive: product.isActive }
+          : currentProduct
+      )));
+      console.error('Failed to toggle status:', error);
     }
   };
 
@@ -111,8 +130,8 @@ const Products = () => {
     <div className="min-h-[100vh] bg-[#064e3b] p-8 -m-6" style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}>
       <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-8 gap-4">
         <div>
-          <h1 className="text-4xl font-extrabold text-white tracking-tight">Products</h1>
-          <p className="text-gray-400 mt-2">{canManageCatalog ? 'Manage your catalog, suppliers, and stock' : 'View live product prices and stock availability'}</p>
+          <h1 className="text-4xl font-extrabold text-white tracking-tight">Store Products</h1>
+          <p className="text-gray-400 mt-2">{canManageCatalog ? 'Manage your store catalog, suppliers, and product details' : 'View live store product prices and availability'}</p>
         </div>
         {canManageCatalog && <button onClick={openAddModal} className="bg-[#10b981] hover:bg-[#059669] text-white px-6 py-3 rounded-xl shadow-[0_0_15px_rgba(16,185,129,0.4)] transition-all font-medium flex items-center shrink-0 cursor-pointer">
           <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4"></path></svg>

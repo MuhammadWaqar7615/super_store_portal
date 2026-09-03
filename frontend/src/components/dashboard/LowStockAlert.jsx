@@ -20,15 +20,18 @@ const LowStockAlert = ({ products }) => {
       </h3>
       <div className="flex-1 overflow-y-auto pr-2">
         <ul className="space-y-4">
-          {products.map((product) => (
-            <li key={product._id} className="flex justify-between items-center p-4 rounded-xl bg-[#10b981]/10 border border-[#10b981]/20">
+          {products.flatMap((product) => [
+            { ...product, location: 'Inventory', quantity: product.inventoryQuantity || 0 },
+            { ...product, location: 'Store', quantity: product.storeQuantity || 0 }
+          ]).filter(product => product.quantity <= (product.minimumStock || 0)).map((product, index) => (
+            <li key={`${product._id}-${product.location}-${index}`} className="flex justify-between items-center p-4 rounded-xl bg-[#10b981]/10 border border-[#10b981]/20">
               <div>
                 <p className="text-white font-medium truncate max-w-[180px]" title={product.name}>{product.name}</p>
-                <p className="text-xs text-gray-400 mt-1">Min: {product.minimumStock} {product.unit}</p>
+                <p className="text-xs text-gray-400 mt-1">{product.location} · Min: {product.minimumStock} {product.unit}</p>
               </div>
               <div className="text-right">
-                <p className={`text-xl font-bold ${product.stockQuantity === 0 ? 'text-red-500' : 'text-orange-400'}`}>
-                  {product.stockQuantity}
+                <p className={`text-xl font-bold ${product.quantity === 0 ? 'text-red-500' : 'text-orange-400'}`}>
+                  {product.quantity}
                 </p>
                 <span className="text-xs text-gray-400">{product.unit}</span>
               </div>

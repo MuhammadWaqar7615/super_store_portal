@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import purchaseService from '../services/purchaseService';
 import supplierService from '../services/supplierService';
+import ProductFormModal from '../components/products/ProductFormModal';
 
 const emptyLine = { productId: '', quantity: 1, purchasePrice: '' };
 
@@ -18,6 +19,9 @@ const Purchases = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+  const [message, setMessage] = useState('');
+  const [isProductModalOpen, setIsProductModalOpen] = useState(false);
+  const [productLineIndex, setProductLineIndex] = useState(0);
 
   const loadData = async () => {
     try {
@@ -50,11 +54,13 @@ const Purchases = () => {
     event.preventDefault();
     setSaving(true);
     setError('');
+    setMessage('');
     try {
       await purchaseService.createPurchase({ supplierId, items });
       setSupplierId('');
       setItems([{ ...emptyLine }]);
       await loadData();
+      setMessage('Purchase saved and stock added to inventory.');
     } catch (err) {
       setError(err.response?.data?.message || 'Unable to save purchase');
     } finally {
@@ -73,6 +79,7 @@ const Purchases = () => {
       </div>
 
       {error && <div className="mb-4 rounded-xl border border-red-400/40 bg-red-500/15 p-3 text-red-100">{error}</div>}
+      {message && <div className="mb-4 rounded-xl border border-green-400/40 bg-green-500/15 p-3 text-green-100">{message}</div>}
 
       {canManagePurchases && <form onSubmit={submitPurchase} className="bg-white/10 border border-white/15 rounded-2xl p-5 mb-8">
         <div className="flex flex-col md:flex-row gap-4 mb-5">
@@ -88,7 +95,13 @@ const Purchases = () => {
         <div className="space-y-3">
           {items.map((item, index) => (
             <div key={index} className="grid grid-cols-1 md:grid-cols-[1fr_140px_160px_44px] gap-3 items-end">
-              <label className="text-sm text-gray-300">Product
+              <label className="text-sm text-gray-300">
+                <span className="flex items-center justify-between gap-3">
+                  <span>Product</span>
+                  <button type="button" onClick={() => { setProductLineIndex(index); setIsProductModalOpen(true); }} className="inline-flex items-center gap-1 text-xs text-[#6ee7b7] hover:text-white">
+                    <Plus size={14} /> New product
+                  </button>
+                </span>
                 <select required value={item.productId} onChange={event => updateLine(index, 'productId', event.target.value)} className="mt-1 w-full rounded-xl bg-black/20 border border-white/20 px-3 py-2.5 text-white">
                   <option value="" className="text-black">Select product</option>
                   {products.map(product => <option key={product._id} value={product._id} className="text-black">{product.name}</option>)}
@@ -109,6 +122,25 @@ const Purchases = () => {
           <button disabled={saving || !supplierId} className="rounded-xl bg-[#10b981] px-5 py-2.5 font-semibold disabled:opacity-50">{saving ? 'Saving...' : 'Save Purchase'}</button>
         </div>
       </form>}
+
+      {canManagePurchases && <ProductFormModal
+        isOpen={isProductModalOpen}
+        onClose={() => setIsProductModalOpen(false)}
+        onSuccess={async (createdProduct) => {
+          await loadData();
+          const createdSupplierId = createdProduct?.supplier?._id || createdProduct?.supplier;
+          if (!supplierId && createdSupplierId) setSupplierId(createdSupplierId);
+          if (createdProduct?._id) {
+            setItems(current => current.map((item, index) => index === productLineIndex
+              ? { ...item, productId: createdProduct._id, purchasePrice: createdProduct.purchasePrice || item.purchasePrice }
+              : item
+            ));
+          }
+          setMessage('Product created. Enter the quantity and save this purchase to add stock to Inventory.');
+        }}
+        initialSupplier={supplierId}
+        productToEdit={null}
+      />}
 
       <div className="bg-white/10 border border-white/15 rounded-2xl overflow-x-auto">
         <table className="min-w-full text-sm">

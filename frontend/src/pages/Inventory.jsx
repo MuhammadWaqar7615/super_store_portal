@@ -3,6 +3,7 @@ import api from '../services/api';
 import InventoryTable from '../components/inventory/InventoryTable';
 import StockAdjustmentModal from '../components/inventory/StockAdjustmentModal';
 import StockMovementList from '../components/inventory/StockMovementList';
+import InventoryEnlistModal from '../components/inventory/InventoryEnlistModal';
 import { useAuth } from '../context/AuthContext';
 
 const Inventory = () => {
@@ -10,7 +11,8 @@ const Inventory = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isAdjustmentModalOpen, setIsAdjustmentModalOpen] = useState(false);
+  const [isEnlistModalOpen, setIsEnlistModalOpen] = useState(false);
   const [productToAdjust, setProductToAdjust] = useState(null);
   
   // To trigger re-render of Movement List
@@ -34,11 +36,16 @@ const Inventory = () => {
 
   const handleAdjustStock = (product) => {
     setProductToAdjust(product);
-    setIsModalOpen(true);
+    setIsAdjustmentModalOpen(true);
   };
 
   const handleAdjustmentSuccess = () => {
     setRefreshKey(prev => prev + 1); // Refresh both inventory and movements
+  };
+
+  const handleEnlist = (product) => {
+    setProductToAdjust(product);
+    setIsEnlistModalOpen(true);
   };
 
   return (
@@ -50,7 +57,7 @@ const Inventory = () => {
         <p className="text-gray-400 mt-2">
           {user?.role === 'Inventory_Manager'
             ? 'Monitor stock levels, supplier flow, and purchase activity'
-            : 'Monitor stock levels and track movements'}
+            : 'Monitor stocked products and track movements'}
         </p>
       </div>
 
@@ -62,6 +69,7 @@ const Inventory = () => {
             <InventoryTable 
               products={products} 
               onAdjustStock={handleAdjustStock}
+              onEnlist={handleEnlist}
             />
           )}
         </div>
@@ -72,8 +80,14 @@ const Inventory = () => {
       </div>
 
       <StockAdjustmentModal 
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        isOpen={isAdjustmentModalOpen}
+        onClose={() => setIsAdjustmentModalOpen(false)}
+        onSuccess={handleAdjustmentSuccess}
+        product={productToAdjust}
+      />
+      <InventoryEnlistModal
+        isOpen={isEnlistModalOpen}
+        onClose={() => setIsEnlistModalOpen(false)}
         onSuccess={handleAdjustmentSuccess}
         product={productToAdjust}
       />

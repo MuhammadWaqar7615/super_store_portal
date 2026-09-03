@@ -57,7 +57,7 @@ const POSCart = ({ cart, onUpdateQuantity, onRemoveItem, isExpanded = true, onTo
                   <button
                     onClick={() => onUpdateQuantity(item.product._id, item.quantity + 1)}
                     className="w-7 h-7 flex items-center justify-center rounded-[4px] text-gray-200 hover:bg-white/5 hover:text-blue-600 transition-colors disabled:opacity-30 disabled:hover:bg-transparent"
-                    disabled={item.quantity >= item.product.stockQuantity}
+                    disabled={item.quantity >= item.product.storeQuantity}
                   >
                     <Plus className="w-3.5 h-3.5" />
                   </button>

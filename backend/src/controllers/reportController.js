@@ -45,15 +45,15 @@ const getPurchasesReport = async (req, res) => {
 const getInventoryReport = async (req, res) => {
   try {
     const [summary, byProduct, lowStock, outOfStock] = await Promise.all([
-      Product.aggregate([{ $group: { _id: null, products: { $sum: 1 }, units: { $sum: '$stockQuantity' }, value: { $sum: { $multiply: ['$stockQuantity', '$purchasePrice'] } } } }]),
+      Product.aggregate([{ $group: { _id: null, products: { $sum: 1 }, inventoryUnits: { $sum: '$inventoryQuantity' }, storeUnits: { $sum: '$storeQuantity' }, units: { $sum: { $add: ['$inventoryQuantity', '$storeQuantity'] } }, value: { $sum: { $multiply: [{ $add: ['$inventoryQuantity', '$storeQuantity'] }, '$purchasePrice'] } } } }]),
       Product.aggregate([
         { $lookup: { from: 'suppliers', localField: 'supplier', foreignField: '_id', as: 'supplier' } },
         { $unwind: { path: '$supplier', preserveNullAndEmptyArrays: true } },
-        { $project: { _id: 0, product: '$name', supplier: '$supplier.name', quantity: '$stockQuantity', total: { $multiply: ['$stockQuantity', '$purchasePrice'] } } },
+        { $project: { _id: 0, product: '$name', supplier: '$supplier.name', inventoryQuantity: 1, storeQuantity: 1, quantity: { $add: ['$inventoryQuantity', '$storeQuantity'] }, total: { $multiply: [{ $add: ['$inventoryQuantity', '$storeQuantity'] }, '$purchasePrice'] } } },
         { $sort: { product: 1 } }
       ]),
-      Product.find({ $expr: { $lte: ['$stockQuantity', '$minimumStock'] } }).select('name stockQuantity minimumStock'),
-      Product.find({ stockQuantity: 0 }).select('name stockQuantity')
+      Product.find({ $expr: { $or: [{ $lte: ['$inventoryQuantity', '$minimumStock'] }, { $lte: ['$storeQuantity', '$minimumStock'] }] } }).select('name inventoryQuantity storeQuantity minimumStock'),
+      Product.find({ $expr: { $and: [{ $eq: ['$inventoryQuantity', 0] }, { $eq: ['$storeQuantity', 0] }] } }).select('name inventoryQuantity storeQuantity')
     ]);
     res.json({ success: true, data: { summary: summary[0] || { products: 0, units: 0, value: 0 }, byProduct, lowStock, outOfStock } });
   }
@@ -203,8 +203,8 @@ const getDashboardMetrics = async (req, res) => {
     const lowStockProducts = await Product.find({
       $expr: {
         $or: [
-          { $lte: ["$stockQuantity", "$minimumStock"] },
-          { $eq: ["$stockQuantity", 0] }
+          { $lte: ["$inventoryQuantity", "$minimumStock"] },
+          { $lte: ["$storeQuantity", "$minimumStock"] }
         ]
       }
     }).limit(5);

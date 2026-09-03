@@ -697,7 +697,9 @@ const Suppliers = () => {
                       </thead>
                       <tbody className="divide-y divide-white/10 text-sm">
                         {traceData.products?.map((product) => {
-                          const stock = product.stockQuantity || 0;
+                          const inventoryStock = product.inventoryQuantity || 0;
+                          const storeStock = product.storeQuantity || 0;
+                          const stock = inventoryStock + storeStock;
                           const purchase = product.purchasePrice || 0;
                           const totalLineCost = stock * purchase;
 
@@ -734,7 +736,7 @@ const Suppliers = () => {
                                     ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
                                     : 'bg-green-500/20 text-green-300 border border-green-500/30'
                                 }`}>
-                                  {stock} {product.unit || 'pcs'}
+                                  Inventory: {inventoryStock} · Store: {storeStock} {product.unit || 'pcs'}
                                 </span>
                               </td>
                               <td className="px-4 py-3 whitespace-nowrap text-right text-[#10b981] font-mono text-xs font-medium">

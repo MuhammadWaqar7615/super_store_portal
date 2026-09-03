@@ -46,7 +46,8 @@ const seedDatabase = async () => {
         category: categories[1]._id, // Dairy
         purchasePrice: 180,
         sellingPrice: 220,
-        stockQuantity: 50,
+        inventoryQuantity: 0,
+        storeQuantity: 50,
         minimumStock: 10,
         unit: 'L'
       },
@@ -55,7 +56,8 @@ const seedDatabase = async () => {
         category: categories[2]._id, // Bakery
         purchasePrice: 100,
         sellingPrice: 150,
-        stockQuantity: 20,
+        inventoryQuantity: 0,
+        storeQuantity: 20,
         minimumStock: 5,
         unit: 'pcs'
       },
@@ -64,7 +66,8 @@ const seedDatabase = async () => {
         category: categories[0]._id, // Beverages
         purchasePrice: 300,
         sellingPrice: 400,
-        stockQuantity: 30,
+        inventoryQuantity: 0,
+        storeQuantity: 30,
         minimumStock: 5,
         unit: 'L'
       }

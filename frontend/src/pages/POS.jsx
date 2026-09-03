@@ -26,12 +26,27 @@ const POS = () => {
 
   const fetchProducts = async () => {
     try {
-      const { data } = await api.get('/products');
+      const { data } = await api.get('/store/products');
       setProducts(data.data || []);
     } catch (error) {
       console.error('Failed to fetch products for POS');
     }
   };
+
+  useEffect(() => {
+    const refreshStoreProducts = () => {
+      if (document.visibilityState === 'visible') {
+        fetchProducts();
+      }
+    };
+
+    window.addEventListener('focus', refreshStoreProducts);
+    document.addEventListener('visibilitychange', refreshStoreProducts);
+    return () => {
+      window.removeEventListener('focus', refreshStoreProducts);
+      document.removeEventListener('visibilitychange', refreshStoreProducts);
+    };
+  }, []);
 
   const fetchPendingCartsCount = async () => {
     try {
@@ -46,7 +61,7 @@ const POS = () => {
     setCart(prevCart => {
       const existing = prevCart.find(item => item.product._id === product._id);
       if (existing) {
-        if (existing.quantity >= product.stockQuantity) return prevCart; // Prevent over-adding
+        if (existing.quantity >= product.storeQuantity) return prevCart; // Prevent over-adding
         return prevCart.map(item =>
           item.product._id === product._id ? { ...item, quantity: item.quantity + 1 } : item
         );

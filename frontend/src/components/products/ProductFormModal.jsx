@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import api from '../../services/api';
 
-const ProductFormModal = ({ isOpen, onClose, onSuccess, productToEdit }) => {
+const ProductFormModal = ({ isOpen, onClose, onSuccess, productToEdit, initialSupplier = '' }) => {
   const [categories, setCategories] = useState([]);
   const [suppliers, setSuppliers] = useState([]);
   const [formData, setFormData] = useState({
@@ -11,7 +11,6 @@ const ProductFormModal = ({ isOpen, onClose, onSuccess, productToEdit }) => {
     supplier: '',
     purchasePrice: '',
     sellingPrice: '',
-    stockQuantity: '',
     minimumStock: '0',
     unit: 'piece',
     isActive: true
@@ -36,7 +35,6 @@ const ProductFormModal = ({ isOpen, onClose, onSuccess, productToEdit }) => {
         supplier: productToEdit.supplier?._id || productToEdit.supplier || '',
         purchasePrice: productToEdit.purchasePrice,
         sellingPrice: productToEdit.sellingPrice,
-        stockQuantity: productToEdit.stockQuantity,
         minimumStock: productToEdit.minimumStock || 0,
         unit: productToEdit.unit || 'piece',
         isActive: productToEdit.isActive
@@ -46,10 +44,9 @@ const ProductFormModal = ({ isOpen, onClose, onSuccess, productToEdit }) => {
         name: '',
         description: '',
         category: '',
-        supplier: '',
+        supplier: initialSupplier,
         purchasePrice: '',
         sellingPrice: '',
-        stockQuantity: '',
         minimumStock: '0',
         unit: 'piece',
         isActive: true
@@ -57,7 +54,7 @@ const ProductFormModal = ({ isOpen, onClose, onSuccess, productToEdit }) => {
     }
     setImageFile(null);
     setError(null);
-  }, [productToEdit, isOpen]);
+  }, [productToEdit, isOpen, initialSupplier]);
 
   const fetchCategories = async () => {
     try {
@@ -92,12 +89,13 @@ const ProductFormModal = ({ isOpen, onClose, onSuccess, productToEdit }) => {
         data.append('image', imageFile);
       }
 
+      let response;
       if (productToEdit) {
-        await api.put(`/products/${productToEdit._id}`, data);
+        response = await api.put(`/products/${productToEdit._id}`, data);
       } else {
-        await api.post('/products', data);
+        response = await api.post('/products', data);
       }
-      onSuccess();
+      onSuccess(response.data?.data);
       onClose();
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to save product');
@@ -198,18 +196,6 @@ const ProductFormModal = ({ isOpen, onClose, onSuccess, productToEdit }) => {
                 className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white" 
                 value={formData.sellingPrice} 
                 onChange={(e) => setFormData({ ...formData, sellingPrice: e.target.value })} 
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-1">Stock Quantity *</label>
-              <input 
-                type="number" 
-                required 
-                min="0" 
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white" 
-                value={formData.stockQuantity} 
-                onChange={(e) => setFormData({ ...formData, stockQuantity: e.target.value })} 
               />
             </div>
 

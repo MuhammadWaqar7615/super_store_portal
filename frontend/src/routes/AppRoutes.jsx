@@ -21,6 +21,7 @@ import Inventory from '../pages/Inventory';
 import POS from '../pages/POS';
 import Receipts from '../pages/Receipts';
 import RegisteredCustomers from '../pages/RegisteredCustomers';
+import Settings from '../pages/Settings';
 
 const PrivateRoute = ({ children, allowedRoles }) => {
   const { user } = useAuth();
@@ -42,6 +43,7 @@ const AppRoutes = () => {
         <Route path="/suppliers" element={<PrivateRoute allowedRoles={['Admin', 'Store_Manager', 'Inventory_Manager']}><Suppliers /></PrivateRoute>} />
         <Route path="/purchases" element={<PrivateRoute allowedRoles={['Admin', 'Store_Manager', 'Inventory_Manager', 'Accounts/Finance', 'Auditor']}><Purchases /></PrivateRoute>} />
         <Route path="/users" element={<PrivateRoute allowedRoles={['Admin']}><Users /></PrivateRoute>} />
+        <Route path="/settings" element={<PrivateRoute allowedRoles={['Admin']}><Settings /></PrivateRoute>} />
         <Route path="/expenses" element={<PrivateRoute allowedRoles={['Admin', 'Store_Manager', 'Accounts/Finance', 'Auditor']}><Expenses /></PrivateRoute>} />
         <Route path="/income" element={<PrivateRoute allowedRoles={['Admin', 'Store_Manager', 'Accounts/Finance', 'Auditor']}><Income /></PrivateRoute>} />
         <Route path="/reports" element={<PrivateRoute allowedRoles={['Admin', 'Inventory_Manager', 'Accounts/Finance', 'Auditor']}><Reports /></PrivateRoute>} />

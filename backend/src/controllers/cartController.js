@@ -55,7 +55,7 @@ exports.submitCart = async (req, res) => {
     for (const item of items) {
       const product = await Product.findById(item.productId);
       const quantity = Number(item.quantity);
-      if (!product || !product.isActive || !Number.isInteger(quantity) || quantity < 1) {
+      if (!product || !product.isActive || product.storeQuantity < quantity || !Number.isInteger(quantity) || quantity < 1) {
         return res.status(400).json({ success: false, message: 'Cart contains an invalid product or quantity' });
       }
 
@@ -174,7 +174,7 @@ exports.finalizeCart = async (req, res) => {
     // Re-validate against current Product data
     for (const item of cart.items) {
       const product = await Product.findById(item.productId);
-      if (!product || !product.isActive || product.stockQuantity < item.quantity || product.sellingPrice !== item.unitPriceSnapshot) {
+      if (!product || !product.isActive || product.storeQuantity < item.quantity || product.sellingPrice !== item.unitPriceSnapshot) {
         cart.status = 'cancelled';
         await cart.save();
         return res.status(400).json({ success: false, message: `Product ${item.productName} is unavailable, out of stock, or price changed.` });

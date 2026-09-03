@@ -13,8 +13,10 @@ const protect = async (req, res, next) => {
       // Check if it's an Admin/Cashier (User) or Customer
       if (decoded.role) {
         req.user = await User.findById(decoded.id).select('-password');
+        req.userType = 'staff';
       } else {
         req.user = await Customer.findById(decoded.id).select('-password');
+        req.userType = 'customer';
       }
 
       if (!req.user) {

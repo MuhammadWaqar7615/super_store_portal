@@ -19,8 +19,8 @@ const validateCart = async (req, res) => {
       if (!product) {
         return res.status(404).json({ success: false, message: `Product ${item.productId} not found` });
       }
-      if (product.stockQuantity < item.quantity) {
-        return res.status(400).json({ success: false, message: `Insufficient stock for ${product.name}` });
+      if (product.storeQuantity < item.quantity) {
+        return res.status(400).json({ success: false, message: `Insufficient store stock for ${product.name}` });
       }
 
       const total = product.sellingPrice * item.quantity;

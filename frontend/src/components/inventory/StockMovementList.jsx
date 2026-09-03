@@ -37,6 +37,8 @@ const StockMovementList = () => {
                   <span className={`font-semibold ${mov.type === 'SALE' ? 'text-blue-400' : mov.type === 'ADJUSTMENT' ? 'text-yellow-400' : 'text-green-400'}`}>
                     {mov.type}
                   </span>
+                  {mov.location && <span> · {mov.location}</span>}
+                  {mov.type === 'TRANSFER' && mov.fromLocation && <span> · {mov.fromLocation} to {mov.toLocation}</span>}
                   {' • '}{mov.reason || 'No reason specified'}
                 </p>
               </div>

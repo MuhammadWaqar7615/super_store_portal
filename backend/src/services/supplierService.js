@@ -35,8 +35,8 @@ const getAllSuppliers = async ({ search, isActive } = {}) => {
       $group: {
         _id: '$supplier',
         productCount: { $sum: 1 },
-        totalStock: { $sum: '$stockQuantity' },
-        totalInventoryCost: { $sum: { $multiply: ['$stockQuantity', '$purchasePrice'] } }
+        totalStock: { $sum: { $add: ['$inventoryQuantity', '$storeQuantity'] } },
+        totalInventoryCost: { $sum: { $multiply: [{ $add: ['$inventoryQuantity', '$storeQuantity'] }, '$purchasePrice'] } }
       }
     }
   ]);
@@ -138,7 +138,9 @@ const getSupplierProductsTraceability = async (supplierId) => {
   let lowStockCount = 0;
 
   products.forEach(p => {
-    const stock = Number(p.stockQuantity) || 0;
+    const inventoryStock = Number(p.inventoryQuantity) || 0;
+    const storeStock = Number(p.storeQuantity) || 0;
+    const stock = inventoryStock + storeStock;
     const purchase = Number(p.purchasePrice) || 0;
     const selling = Number(p.sellingPrice) || 0;
     const minStock = Number(p.minimumStock) || 0;

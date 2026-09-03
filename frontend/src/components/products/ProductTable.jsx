@@ -11,7 +11,7 @@ const ProductTable = ({ products, onEdit, onDelete, onToggleActive, readOnly = f
             <th className="px-6 py-4 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">Category</th>
             <th className="px-6 py-4 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">Supplier</th>
             <th className="px-6 py-4 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">Price (Rs.)</th>
-            <th className="px-6 py-4 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">Stock</th>
+            <th className="px-6 py-4 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">Inventory / Store</th>
             <th className="px-6 py-4 text-center text-xs font-semibold text-gray-300 uppercase tracking-wider">Status</th>
             {!readOnly && <th className="px-6 py-4 text-right text-xs font-semibold text-gray-300 uppercase tracking-wider">Actions</th>}
           </tr>
@@ -59,15 +59,12 @@ const ProductTable = ({ products, onEdit, onDelete, onToggleActive, readOnly = f
                 {product.sellingPrice}
               </td>
 
-              {/* Stock */}
+              {/* Stock locations */}
               <td className="px-6 py-4 whitespace-nowrap">
-                <span className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                  product.stockQuantity > (product.minimumStock || 0) 
-                    ? 'bg-green-500/20 text-green-300 border border-green-500/30' 
-                    : 'bg-[#10b981]/20 text-[#10b981] border border-[#10b981]/30 shadow-[0_0_10px_rgba(16,185,129,0.3)]'
-                }`}>
-                  {product.stockQuantity} {product.unit}
-                </span>
+                <div className="flex flex-col gap-1 text-xs">
+                  <span className="text-amber-300">Inventory: {product.inventoryQuantity || 0} {product.unit}</span>
+                  <span className="text-green-300">Store: {product.storeQuantity || 0} {product.unit}</span>
+                </div>
               </td>
 
               {/* Status */}

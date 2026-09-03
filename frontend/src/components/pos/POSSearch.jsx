@@ -3,7 +3,7 @@ import { Search, Image as ImageIcon, AlertTriangle, Trash2 } from 'lucide-react'
 
 const POSSearch = ({ products, onAddToCart, searchTerm, setSearchTerm, onClearCart, cart }) => {
   const filteredProducts = products.filter(p =>
-    p.name.toLowerCase().includes(searchTerm.toLowerCase()) && p.stockQuantity > 0 && p.isActive
+    p.name.toLowerCase().includes(searchTerm.toLowerCase()) && p.storeQuantity > 0 && p.isActive
   );
 
   return (
@@ -39,7 +39,7 @@ const POSSearch = ({ products, onAddToCart, searchTerm, setSearchTerm, onClearCa
       <div className="flex-1 overflow-y-auto p-4 bg-transparent">
         <div className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-3">
           {filteredProducts.map(product => {
-            const isLowStock = product.stockQuantity <= (product.minimumStock || 5);
+            const isLowStock = product.storeQuantity <= (product.minimumStock || 5);
             
             return (
               <div
@@ -62,7 +62,7 @@ const POSSearch = ({ products, onAddToCart, searchTerm, setSearchTerm, onClearCa
                     <span className="text-blue-700 font-bold text-[14px]">Rs. {product.sellingPrice}</span>
                     <span className={`text-[11px] flex items-center font-medium bg-white/5 px-1.5 py-0.5 rounded ${isLowStock ? 'text-amber-600 bg-amber-50' : 'text-gray-300'}`}>
                       {isLowStock && <AlertTriangle className="w-3 h-3 mr-1" />}
-                      {product.stockQuantity} in stock
+                      {product.storeQuantity} in store
                     </span>
                   </div>
                 </div>

@@ -33,8 +33,8 @@ const completeSale = async (saleId, session) => {
   const completedAt = new Date();
   for (const item of sale.items) {
     const productBeforeUpdate = await Product.findOneAndUpdate(
-      { _id: item.productId, stockQuantity: { $gte: item.quantity } },
-      { $inc: { stockQuantity: -item.quantity } },
+      { _id: item.productId, storeQuantity: { $gte: item.quantity } },
+      { $inc: { storeQuantity: -item.quantity } },
       { session, returnDocument: 'before' }
     );
 
@@ -48,8 +48,9 @@ const completeSale = async (saleId, session) => {
       productId: item.productId,
       type: 'SALE',
       quantity: item.quantity,
-      previousStock: productBeforeUpdate.stockQuantity,
-      newStock: productBeforeUpdate.stockQuantity - item.quantity,
+      previousStock: productBeforeUpdate.storeQuantity,
+      newStock: productBeforeUpdate.storeQuantity - item.quantity,
+      location: 'STORE',
       referenceType: 'SALE',
       referenceId: sale._id,
       createdBy: sale.cashierId,
