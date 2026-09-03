@@ -7,6 +7,9 @@ const normalizeRole = (role) => ({
   'Store Manager': 'Store_Manager',
   'Store-Manager': 'Store_Manager',
   Store_Manager: 'Store_Manager',
+  'Inventory Manager': 'Inventory_Manager',
+  'Inventory-Manager': 'Inventory_Manager',
+  Inventory_Manager: 'Inventory_Manager',
   'Accounts/Finance': 'Accounts/Finance',
 }[role]);
 

@@ -3,8 +3,10 @@ import api from '../services/api';
 import InventoryTable from '../components/inventory/InventoryTable';
 import StockAdjustmentModal from '../components/inventory/StockAdjustmentModal';
 import StockMovementList from '../components/inventory/StockMovementList';
+import { useAuth } from '../context/AuthContext';
 
 const Inventory = () => {
+  const { user } = useAuth();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   
@@ -42,8 +44,14 @@ const Inventory = () => {
   return (
     <div className="min-h-[100vh] bg-[#064e3b] p-8 -m-6" style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}>
       <div className="mb-8">
-        <h1 className="text-4xl font-extrabold text-white tracking-tight">Inventory Management</h1>
-        <p className="text-gray-400 mt-2">Monitor stock levels and track movements</p>
+        <h1 className="text-4xl font-extrabold text-white tracking-tight">
+          {user?.role === 'Inventory_Manager' ? 'Inventory Dashboard' : 'Inventory Management'}
+        </h1>
+        <p className="text-gray-400 mt-2">
+          {user?.role === 'Inventory_Manager'
+            ? 'Monitor stock levels, supplier flow, and purchase activity'
+            : 'Monitor stock levels and track movements'}
+        </p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

@@ -9,7 +9,7 @@ const emptyLine = { productId: '', quantity: 1, purchasePrice: '' };
 
 const Purchases = () => {
   const { user } = useAuth();
-  const canManagePurchases = user?.role === 'Admin' || user?.role === 'Store_Manager';
+  const canManagePurchases = user?.role === 'Admin' || user?.role === 'Store_Manager' || user?.role === 'Inventory_Manager';
   const [suppliers, setSuppliers] = useState([]);
   const [products, setProducts] = useState([]);
   const [purchases, setPurchases] = useState([]);

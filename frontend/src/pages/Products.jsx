@@ -6,7 +6,7 @@ import { useAuth } from '../context/AuthContext';
 
 const Products = () => {
   const { user } = useAuth();
-  const canManageCatalog = user?.role === 'Admin' || user?.role === 'Store_Manager';
+  const canManageCatalog = user?.role === 'Admin' || user?.role === 'Store_Manager' || user?.role === 'Inventory_Manager';
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [categories, setCategories] = useState([]);

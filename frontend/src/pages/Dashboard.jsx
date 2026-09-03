@@ -15,8 +15,11 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const isFinance = user?.role === 'Accounts/Finance';
   const isStoreManager = user?.role === 'Store_Manager';
-  const dashboardTitle = isStoreManager ? 'Store Manager Dashboard' : 'Admin Dashboard';
-  const dashboardSubtitle = isStoreManager
+  const isInventoryManager = user?.role === 'Inventory_Manager';
+  const dashboardTitle = isInventoryManager ? 'Inventory Dashboard' : isStoreManager ? 'Store Manager Dashboard' : 'Admin Dashboard';
+  const dashboardSubtitle = isInventoryManager
+    ? 'Stock levels, supplier flow, and purchase activity'
+    : isStoreManager
     ? 'Operational store metrics and inventory insights'
     : 'Real-time business metrics and insights';
 
@@ -30,9 +33,9 @@ const Dashboard = () => {
       return;
     }
 
-    // Enforcement: Admin and Store Manager can view the operational dashboard
-    if (user?.role !== 'Admin' && user?.role !== 'Store_Manager') {
-      setError('Unauthorized access. Only Admins and Store Managers can view the dashboard.');
+    // Enforcement: Admin, Store Manager, and Inventory Manager can view the operational dashboard
+    if (user?.role !== 'Admin' && user?.role !== 'Store_Manager' && user?.role !== 'Inventory_Manager') {
+      setError('Unauthorized access. Only Admins, Store Managers, and Inventory Managers can view the dashboard.');
       setLoading(false);
       return;
     }

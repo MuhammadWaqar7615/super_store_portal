@@ -4,12 +4,12 @@ const { getDashboardMetrics, getCashierDashboardMetrics, getSalesReport, getPurc
 const { protect } = require('../middleware/authMiddleware');
 const { authorizeRoles } = require('../middleware/roleMiddleware');
 
-router.get('/dashboard', protect, authorizeRoles('Admin', 'Store_Manager'), getDashboardMetrics);
+router.get('/dashboard', protect, authorizeRoles('Admin', 'Store_Manager', 'Inventory_Manager'), getDashboardMetrics);
 router.get('/accountant-dashboard', protect, authorizeRoles('Admin', 'Accounts/Finance', 'Auditor'), getAccountantDashboardMetrics);
 router.get('/cashier-dashboard', protect, authorizeRoles('Cashier'), getCashierDashboardMetrics);
 router.get('/sales', protect, authorizeRoles('Admin', 'Accounts/Finance', 'Auditor'), getSalesReport);
 router.get('/purchases', protect, authorizeRoles('Admin', 'Store_Manager', 'Inventory_Manager', 'Accounts/Finance', 'Auditor'), getPurchasesReport);
-router.get('/inventory', protect, authorizeRoles('Admin'), getInventoryReport);
+router.get('/inventory', protect, authorizeRoles('Admin', 'Store_Manager', 'Inventory_Manager', 'Auditor'), getInventoryReport);
 router.get('/payments', protect, authorizeRoles('Admin'), getPaymentsReport);
 router.get('/expenses', protect, authorizeRoles('Admin', 'Accounts/Finance', 'Auditor'), getExpensesReport);
 router.get('/income', protect, authorizeRoles('Admin', 'Accounts/Finance', 'Auditor'), getIncomeReport);

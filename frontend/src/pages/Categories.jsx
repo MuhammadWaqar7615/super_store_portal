@@ -6,7 +6,7 @@ import { useAuth } from '../context/AuthContext';
 
 const Categories = () => {
   const { user } = useAuth();
-  const canManageCategories = user?.role === 'Admin' || user?.role === 'Store_Manager';
+  const canManageCategories = user?.role === 'Admin' || user?.role === 'Store_Manager' || user?.role === 'Inventory_Manager';
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);

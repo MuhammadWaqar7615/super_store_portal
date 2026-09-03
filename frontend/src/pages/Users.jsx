@@ -7,11 +7,13 @@ const blankForm = { name: '', email: '', password: '', role: 'Cashier', isActive
 const roles = [
   { value: 'Cashier', label: 'Cashier' },
   { value: 'Store_Manager', label: 'Store Manager' },
+  { value: 'Inventory_Manager', label: 'Inventory Manager' },
   { value: 'Accounts/Finance', label: 'Accounts / Finance' },
   { value: 'Admin', label: 'Admin' },
 ];
 const roleLabel = (role) => {
   if (role === 'Store_Manager' || role === 'Store-Manager' || role === 'Store Manager') return 'Store Manager';
+  if (role === 'Inventory_Manager' || role === 'Inventory Manager' || role === 'Inventory-Manager') return 'Inventory Manager';
   if (role === 'Accounts/Finance') return 'Accounts / Finance';
   return role;
 };
@@ -63,7 +65,18 @@ const Users = () => {
 
   const edit = (staff) => {
     setEditingId(staff._id);
-    setForm({ name: staff.name || '', email: staff.email, password: '', role: staff.role === 'Store Manager' || staff.role === 'Store-Manager' ? 'Store_Manager' : staff.role, isActive: staff.isActive !== false });
+    setForm({
+      name: staff.name || '',
+      email: staff.email,
+      password: '',
+      role:
+        staff.role === 'Store Manager' || staff.role === 'Store-Manager'
+          ? 'Store_Manager'
+          : staff.role === 'Inventory Manager' || staff.role === 'Inventory-Manager'
+            ? 'Inventory_Manager'
+            : staff.role,
+      isActive: staff.isActive !== false
+    });
   };
 
   const remove = async (staff) => {
