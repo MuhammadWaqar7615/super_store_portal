@@ -46,42 +46,42 @@ const AdminLayout = () => {
     }
   };
 
-  const financeNavItems = [
-    { name: 'Dashboard (Financial)', path: '/accountant-dashboard', icon: <LayoutDashboard size={20} /> },
-    { name: 'Expenses', path: '/expenses', icon: <Receipt size={20} /> },
-    { name: 'Income', path: '/income', icon: <TrendingUp size={20} /> },
-    { name: 'Reports', path: '/reports', icon: <BarChart3 size={20} /> },
-    { name: 'Sales', path: '/sales', icon: <ReceiptText size={20} /> },
-    { name: 'Purchases', path: '/purchases', icon: <PackagePlus size={20} /> },
+  const hasAccess = (permissionKey, defaultRoles = []) => {
+    if (!user) return false;
+    if (user.role === 'Admin') return true;
+    if (user.permissions && user.permissions.includes(permissionKey)) return true;
+    if (defaultRoles.includes(user.role)) return true;
+    return false;
+  };
+
+  const allNavItems = [
+    { name: 'Dashboard', path: '/dashboard', icon: <LayoutDashboard size={20} />, key: 'dashboard', roles: ['Admin', 'Store_Manager', 'Inventory_Manager', 'Cashier'] },
+    { name: 'Dashboard (Financial)', path: '/accountant-dashboard', icon: <LayoutDashboard size={20} />, key: 'income', roles: ['Accounts/Finance'] },
+    { name: 'POS', path: '/pos', icon: <MonitorPlay size={20} />, key: 'pos', roles: ['Admin', 'Cashier'] },
+    { name: 'Sales', path: '/sales', icon: <ReceiptText size={20} />, key: 'sales', roles: ['Admin', 'Store_Manager', 'Cashier', 'Accounts/Finance'] },
+    { name: 'Receipts', path: '/receipts', icon: <Receipt size={20} />, key: 'sales', roles: ['Admin', 'Store_Manager', 'Cashier'] },
+    { name: 'Store Products', path: '/products', icon: <Package size={20} />, key: 'products', roles: ['Admin', 'Store_Manager', 'Inventory_Manager', 'Cashier'] },
+    { name: 'Customers', path: '/customers', icon: <UserRound size={20} />, key: 'customers', roles: ['Admin', 'Store_Manager', 'Cashier'] },
+    { name: 'Categories', path: '/categories', icon: <Tags size={20} />, key: 'categories', roles: ['Admin', 'Store_Manager', 'Inventory_Manager', 'Cashier'] },
   ];
 
-  const navItems = isFinance ? [] : user?.role === 'Inventory_Manager' ? [
-    { name: 'Dashboard', path: '/dashboard', icon: <LayoutDashboard size={20} /> },
-    { name: 'Store Products', path: '/products', icon: <Package size={20} /> },
-    { name: 'Categories', path: '/categories', icon: <Tags size={20} /> },
-    { name: 'Suppliers', path: '/suppliers', icon: <Truck size={20} /> },
-    { name: 'Purchases', path: '/purchases', icon: <PackagePlus size={20} /> },
-    { name: 'Inventory', path: '/inventory', icon: <Warehouse size={20} /> },
-    { name: 'Reports', path: '/reports', icon: <BarChart3 size={20} /> },
-  ] : [
-    { name: 'Dashboard', path: '/dashboard', icon: <LayoutDashboard size={20} /> },
-    ...(user?.role === 'Cashier' ? [{ name: 'POS', path: '/pos', icon: <MonitorPlay size={20} /> }] : []),
-    { name: 'Sales', path: '/sales', icon: <ReceiptText size={20} /> },
-    { name: 'Receipts', path: '/receipts', icon: <Receipt size={20} /> },
-    { name: 'Store Products', path: '/products', icon: <Package size={20} /> },
-    { name: 'Customers', path: '/customers', icon: <UserRound size={20} /> },
-    { name: 'Categories', path: '/categories', icon: <Tags size={20} /> },
+  const operationsNavItems = [
+    { name: 'Suppliers', path: '/suppliers', icon: <Truck size={20} />, key: 'suppliers', roles: ['Admin', 'Store_Manager', 'Inventory_Manager'] },
+    { name: 'Purchases', path: '/purchases', icon: <PackagePlus size={20} />, key: 'purchases', roles: ['Admin', 'Store_Manager', 'Inventory_Manager', 'Accounts/Finance'] },
+    { name: 'Inventory', path: '/inventory', icon: <Warehouse size={20} />, key: 'inventory', roles: ['Admin', 'Store_Manager', 'Inventory_Manager'] },
+    { name: 'Expenses', path: '/expenses', icon: <Receipt size={20} />, key: 'expenses', roles: ['Admin', 'Store_Manager', 'Accounts/Finance'] },
+    { name: 'Income', path: '/income', icon: <TrendingUp size={20} />, key: 'income', roles: ['Admin', 'Store_Manager', 'Accounts/Finance'] },
   ];
 
   const adminNavItems = [
-    { name: 'Suppliers', path: '/suppliers', icon: <Truck size={20} /> },
-    { name: 'Purchases', path: '/purchases', icon: <PackagePlus size={20} /> },
-    { name: 'Inventory', path: '/inventory', icon: <Warehouse size={20} /> },
-    ...(user?.role === 'Admin' || isStoreManager ? [
-      { name: 'Expenses', path: '/expenses', icon: <Receipt size={20} /> },
-      { name: 'Income', path: '/income', icon: <TrendingUp size={20} /> },
-    ] : []),
+    { name: 'Users', path: '/users', icon: <UsersRound size={20} />, key: 'users', roles: ['Admin'] },
+    { name: 'Settings', path: '/settings', icon: <Settings size={20} />, key: 'settings', roles: ['Admin'] },
+    { name: 'Reports', path: '/reports', icon: <BarChart3 size={20} />, key: 'reports', roles: ['Admin', 'Inventory_Manager', 'Accounts/Finance'] },
   ];
+
+  const visibleMainItems = allNavItems.filter(item => hasAccess(item.key, item.roles));
+  const visibleOpItems = operationsNavItems.filter(item => hasAccess(item.key, item.roles));
+  const visibleAdminItems = adminNavItems.filter(item => hasAccess(item.key, item.roles));
 
   return (
     <div className="flex h-screen bg-[#064e3b] relative overflow-hidden">
@@ -130,7 +130,7 @@ const AdminLayout = () => {
 
         {/* Navigation */}
         <nav className="flex-1 px-3 py-2 space-y-1 overflow-y-auto overflow-x-hidden hide-scrollbar">
-          {navItems.map((item) => (
+          {visibleMainItems.map((item) => (
             <Link
               key={item.path}
               to={item.path}
@@ -147,15 +147,12 @@ const AdminLayout = () => {
             </Link>
           ))}
 
-          {!isFinance && (user?.role === 'Admin' || isStoreManager || isInventoryManager) && (
+          {visibleOpItems.length > 0 && (
             <div className="pt-4 pb-1">
               <div className={`overflow-hidden transition-all duration-300 ${isCollapsed ? 'h-0 opacity-0' : 'h-auto opacity-100 px-3 mb-2'}`}>
-                <p className="text-[11px] uppercase text-gray-500 font-semibold tracking-wider">
-                  {isInventoryManager ? 'Inventory' : 'Operations'}
-                </p>
+                <p className="text-[11px] uppercase text-gray-500 font-semibold tracking-wider">Operations</p>
               </div>
-
-              {adminNavItems.map((item) => (
+              {visibleOpItems.map((item) => (
                 <Link
                   key={item.path}
                   to={item.path}
@@ -171,58 +168,15 @@ const AdminLayout = () => {
                   </div>
                 </Link>
               ))}
-
-              {user?.role === 'Admin' && (
-                <>
-                  <div className={`overflow-hidden transition-all duration-300 ${isCollapsed ? 'h-0 opacity-0' : 'h-auto opacity-100 px-3 mb-2 mt-4'}`}>
-                    <p className="text-[11px] uppercase text-gray-500 font-semibold tracking-wider">Admin</p>
-                  </div>
-                  <Link
-                    to="/users"
-                    onClick={() => { if (window.innerWidth < 1024) setIsMobileOpen(false); }}
-                    className={`flex items-center ${isCollapsed ? 'justify-center w-10 h-10 mx-auto rounded-full mt-1' : 'px-3 py-2.5 rounded-xl mt-1'} transition-all group ${location.pathname === '/users' ? 'bg-[#1a2321] text-[#10b981]' : 'text-gray-300 hover:bg-[#1a1a1a] hover:text-white'}`}
-                    title={isCollapsed ? 'Users' : ''}
-                  >
-                    <div className="flex-shrink-0 flex items-center justify-center w-6 h-6">
-                      <UsersRound size={18} />
-                    </div>
-                    <div className={`overflow-hidden transition-all duration-300 whitespace-nowrap ${isCollapsed ? 'w-0 opacity-0' : 'w-auto opacity-100 ml-3'}`}>
-                      <span className="font-medium text-[14px]">Users</span>
-                    </div>
-                  </Link>
-                  <Link
-                    to="/settings"
-                    onClick={() => { if (window.innerWidth < 1024) setIsMobileOpen(false); }}
-                    className={`flex items-center ${isCollapsed ? 'justify-center w-10 h-10 mx-auto rounded-full mt-1' : 'px-3 py-2.5 rounded-xl mt-1'} transition-all group ${location.pathname === '/settings' ? 'bg-[#1a2321] text-[#10b981]' : 'text-gray-300 hover:bg-[#1a1a1a] hover:text-white'}`}
-                    title={isCollapsed ? 'Settings' : ''}
-                  >
-                    <div className="flex-shrink-0 flex items-center justify-center w-6 h-6"><Settings size={18} /></div>
-                    <div className={`overflow-hidden transition-all duration-300 whitespace-nowrap ${isCollapsed ? 'w-0 opacity-0' : 'w-auto opacity-100 ml-3'}`}><span className="font-medium text-[14px]">Settings</span></div>
-                  </Link>
-                  <Link
-                    to="/reports"
-                    onClick={() => { if (window.innerWidth < 1024) setIsMobileOpen(false); }}
-                    className={`flex items-center ${isCollapsed ? 'justify-center w-10 h-10 mx-auto rounded-full mt-1' : 'px-3 py-2.5 rounded-xl mt-1'} transition-all group ${location.pathname === '/reports' ? 'bg-[#1a2321] text-[#10b981]' : 'text-gray-300 hover:bg-[#1a1a1a] hover:text-white'}`}
-                    title={isCollapsed ? 'Reports' : ''}
-                  >
-                    <div className="flex-shrink-0 flex items-center justify-center w-6 h-6">
-                      <BarChart3 size={18} />
-                    </div>
-                    <div className={`overflow-hidden transition-all duration-300 whitespace-nowrap ${isCollapsed ? 'w-0 opacity-0' : 'w-auto opacity-100 ml-3'}`}>
-                      <span className="font-medium text-[14px]">Reports</span>
-                    </div>
-                  </Link>
-                </>
-              )}
             </div>
           )}
 
-          {isFinance && (
+          {visibleAdminItems.length > 0 && (
             <div className="pt-4 pb-1">
               <div className={`overflow-hidden transition-all duration-300 ${isCollapsed ? 'h-0 opacity-0' : 'h-auto opacity-100 px-3 mb-2'}`}>
-                <p className="text-[11px] uppercase text-gray-500 font-semibold tracking-wider">Finance</p>
+                <p className="text-[11px] uppercase text-gray-500 font-semibold tracking-wider">Management</p>
               </div>
-              {financeNavItems.map((item) => (
+              {visibleAdminItems.map((item) => (
                 <Link
                   key={item.path}
                   to={item.path}

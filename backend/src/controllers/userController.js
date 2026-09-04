@@ -1,6 +1,14 @@
 const User = require('../models/User');
 const { hashPassword } = require('./authController');
 
+const DEFAULT_ROLE_PERMISSIONS = {
+  Admin: ['dashboard', 'pos', 'products', 'categories', 'suppliers', 'purchases', 'inventory', 'sales', 'customers', 'expenses', 'income', 'reports', 'users', 'settings'],
+  Store_Manager: ['dashboard', 'pos', 'products', 'categories', 'suppliers', 'purchases', 'inventory', 'sales', 'customers', 'expenses', 'income'],
+  Inventory_Manager: ['dashboard', 'products', 'categories', 'suppliers', 'purchases', 'inventory', 'reports'],
+  Cashier: ['dashboard', 'pos', 'products', 'categories', 'sales', 'customers'],
+  'Accounts/Finance': ['dashboard', 'sales', 'purchases', 'expenses', 'income', 'reports'],
+};
+
 const normalizeRole = (role) => ({
   Admin: 'Admin',
   Cashier: 'Cashier',
@@ -14,15 +22,19 @@ const normalizeRole = (role) => ({
 }[role]);
 
 const publicUser = (user) => {
-  const result = user.toObject ? user.toObject() : user;
+  const result = user.toObject ? user.toObject() : { ...user };
   delete result.password;
+  if (!result.permissions || result.permissions.length === 0) {
+    result.permissions = DEFAULT_ROLE_PERMISSIONS[result.role] || [];
+  }
   return result;
 };
 
 const getUsers = async (req, res) => {
   try {
     const users = await User.find().select('-password').sort({ createdAt: -1 });
-    res.json({ success: true, data: users });
+    const formattedUsers = users.map(user => publicUser(user));
+    res.json({ success: true, data: formattedUsers });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Server error fetching users' });
   }
@@ -30,7 +42,7 @@ const getUsers = async (req, res) => {
 
 const createUser = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, permissions } = req.body;
     const role = normalizeRole(req.body.role);
     if (!name || !email || !password) {
       return res.status(422).json({ success: false, message: 'Name, email, and password are required' });
@@ -40,7 +52,18 @@ const createUser = async (req, res) => {
     }
     const exists = await User.findOne({ email: email.toLowerCase() });
     if (exists) return res.status(409).json({ success: false, message: 'Email is already in use' });
-    const user = await User.create({ name, email, password: await hashPassword(password), role });
+
+    const finalPermissions = Array.isArray(permissions) && permissions.length > 0
+      ? permissions
+      : (DEFAULT_ROLE_PERMISSIONS[role] || []);
+
+    const user = await User.create({
+      name,
+      email: email.toLowerCase(),
+      password: await hashPassword(password),
+      role,
+      permissions: finalPermissions
+    });
     res.status(201).json({ success: true, data: publicUser(user) });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Server error creating user' });
@@ -49,7 +72,7 @@ const createUser = async (req, res) => {
 
 const updateUser = async (req, res) => {
   try {
-    const { name, isActive, password } = req.body;
+    const { name, isActive, password, permissions } = req.body;
     const role = req.body.role === undefined ? undefined : normalizeRole(req.body.role);
     if (req.params.id === req.user._id.toString() && isActive === false) {
       return res.status(403).json({ success: false, message: 'You cannot deactivate your own account' });
@@ -64,9 +87,11 @@ const updateUser = async (req, res) => {
     }
     if (isActive !== undefined) updates.isActive = isActive;
     if (password) updates.password = await hashPassword(password);
+    if (Array.isArray(permissions)) updates.permissions = permissions;
+
     const user = await User.findByIdAndUpdate(req.params.id, { $set: updates }, { new: true, runValidators: true }).select('-password');
     if (!user) return res.status(404).json({ success: false, message: 'User not found' });
-    res.json({ success: true, data: user });
+    res.json({ success: true, data: publicUser(user) });
   } catch (error) {
     res.status(error.name === 'ValidationError' ? 422 : 500).json({ success: false, message: error.message || 'Server error updating user' });
   }
@@ -85,4 +110,4 @@ const deleteUser = async (req, res) => {
   }
 };
 
-module.exports = { getUsers, createUser, updateUser, deleteUser };
+module.exports = { getUsers, createUser, updateUser, deleteUser, DEFAULT_ROLE_PERMISSIONS };
