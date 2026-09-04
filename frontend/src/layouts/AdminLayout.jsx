@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
+import backupService from '../services/backupService';
 import {
   LayoutDashboard,
   MonitorPlay,
@@ -20,7 +21,8 @@ import {
   ChevronLeft,
   Menu,
   User,
-  Settings
+  Settings,
+  Database
 } from 'lucide-react';
 
 const AdminLayout = () => {
@@ -45,6 +47,30 @@ const AdminLayout = () => {
       navigate('/login');
     }
   };
+
+  useEffect(() => {
+    const autoDownloadBackup = async () => {
+      if (user?.role === 'Admin' && !sessionStorage.getItem('auto_backup_downloaded')) {
+        try {
+          const response = await backupService.exportData();
+          const blob = new Blob([JSON.stringify(response.data, null, 2)], { type: 'application/json' });
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `super_store_auto_backup_${new Date().toISOString().split('T')[0]}.json`;
+          a.click();
+          window.URL.revokeObjectURL(url);
+          sessionStorage.setItem('auto_backup_downloaded', 'true');
+        } catch (error) {
+          console.error('Auto backup failed', error);
+        }
+      }
+    };
+    
+    if (user) {
+      autoDownloadBackup();
+    }
+  }, [user]);
 
   const hasAccess = (permissionKey, defaultRoles = []) => {
     if (!user) return false;
@@ -75,6 +101,7 @@ const AdminLayout = () => {
 
   const adminNavItems = [
     { name: 'Users', path: '/users', icon: <UsersRound size={20} />, key: 'users', roles: ['Admin'] },
+    { name: 'Data Management', path: '/backup', icon: <Database size={20} />, key: 'settings', roles: ['Admin'] },
     { name: 'Settings', path: '/settings', icon: <Settings size={20} />, key: 'settings', roles: ['Admin'] },
     { name: 'Reports', path: '/reports', icon: <BarChart3 size={20} />, key: 'reports', roles: ['Admin', 'Inventory_Manager', 'Accounts/Finance'] },
   ];
