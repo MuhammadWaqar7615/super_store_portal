@@ -133,10 +133,10 @@ const Products = () => {
           <h1 className="text-4xl font-extrabold text-white tracking-tight">Store Products</h1>
           <p className="text-gray-400 mt-2">{canManageCatalog ? 'Manage your store catalog, suppliers, and product details' : 'View live store product prices and availability'}</p>
         </div>
-        {/* {canManageCatalog && <button onClick={openAddModal} className="bg-[#10b981] hover:bg-[#059669] text-white px-6 py-3 rounded-xl shadow-[0_0_15px_rgba(16,185,129,0.4)] transition-all font-medium flex items-center shrink-0 cursor-pointer">
+        {canManageCatalog && <button onClick={openAddModal} className="bg-[#10b981] hover:bg-[#059669] text-white px-6 py-3 rounded-xl shadow-[0_0_15px_rgba(16,185,129,0.4)] transition-all font-medium flex items-center shrink-0 cursor-pointer">
           <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4"></path></svg>
           Add Product
-        </button>} */}
+        </button>}
       </div>
 
       {/* Filters */}
