@@ -145,4 +145,433 @@ const clearModule = async (req, res) => {
   }
 };
 
-module.exports = { getSettingsSummary, clearModule };
+const DummyPreset = require('../models/DummyPreset');
+
+const defaultPresetData = {
+  categories: [
+    { name: 'Electronics' },
+    { name: 'Beverages' },
+    { name: 'Groceries' }
+  ],
+  suppliers: [
+    {
+      name: 'Apex Electronics Ltd.',
+      contactPerson: 'Michael Scott',
+      email: 'apex@electronics.com',
+      phone: '+923001112233',
+      address: '12 Tech Avenue, Industrial Zone',
+      openingBalance: 0,
+      currentBalance: 0
+    },
+    {
+      name: 'Global Beverage Distributors',
+      contactPerson: 'Sarah Jenkins',
+      email: 'sales@globalbeverage.com',
+      phone: '+923004445566',
+      address: '45 Commerce Way, Logistics Park',
+      openingBalance: 0,
+      currentBalance: 0
+    }
+  ],
+  products: [
+    {
+      name: 'Wireless Noise-Canceling Headphones',
+      description: 'High quality Bluetooth over-ear headphones with active noise cancellation.',
+      categoryIndex: 0,
+      supplierIndex: 0,
+      purchasePrice: 4500,
+      sellingPrice: 6500,
+      inventoryQuantity: 50,
+      storeQuantity: 25,
+      minimumStock: 10,
+      unit: 'pcs',
+      image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&auto=format&fit=crop&q=80'
+    },
+    {
+      name: 'Organic Coffee Beans (1kg)',
+      description: 'Premium dark roast Arabica coffee beans imported fresh.',
+      categoryIndex: 1,
+      supplierIndex: 1,
+      purchasePrice: 1200,
+      sellingPrice: 1800,
+      inventoryQuantity: 100,
+      storeQuantity: 40,
+      minimumStock: 15,
+      unit: 'kg',
+      image: 'https://images.unsplash.com/photo-1559056199-641a0ac8b55e?w=800&auto=format&fit=crop&q=80'
+    },
+    {
+      name: 'Smart Watch Series 5',
+      description: 'Fitness tracker with heart rate monitor, GPS, and OLED display.',
+      categoryIndex: 0,
+      supplierIndex: 0,
+      purchasePrice: 8000,
+      sellingPrice: 12000,
+      inventoryQuantity: 30,
+      storeQuantity: 15,
+      minimumStock: 5,
+      unit: 'pcs',
+      image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&auto=format&fit=crop&q=80'
+    }
+  ],
+  customers: [
+    {
+      name: 'Ali Khan',
+      phone: '+923009998877',
+      email: 'ali.khan@example.com',
+      address: 'Block 5, Clifton, Karachi',
+      isRegistered: true
+    },
+    {
+      name: 'Sara Ahmed',
+      phone: '+923007776655',
+      email: 'sara.ahmed@example.com',
+      address: 'Gulberg III, Lahore',
+      isRegistered: true
+    }
+  ],
+  expenses: [
+    {
+      title: 'Store Monthly Rent',
+      category: 'Rent',
+      amount: 45000,
+      description: 'Monthly commercial space lease payment',
+      paymentMethod: 'Bank Transfer'
+    },
+    {
+      title: 'Utilities & Electricity',
+      category: 'Electricity',
+      amount: 12500,
+      description: 'Commercial grid electricity bill',
+      paymentMethod: 'Cash'
+    }
+  ],
+  manualIncome: [
+    {
+      title: 'Consulting & Setup Fee',
+      source: 'Services',
+      amount: 15000,
+      referenceType: 'manual'
+    }
+  ]
+};
+
+const clearAll = async (req, res) => {
+  if (req.body.confirmed !== true) {
+    return res.status(400).json({
+      success: false,
+      message: 'This destructive action requires confirmation'
+    });
+  }
+
+  try {
+    const deleted = {};
+    const db = mongoose.connection.db;
+    const collections = await db.listCollections().toArray();
+
+    for (const colInfo of collections) {
+      const colName = colInfo.name;
+      if (colName.startsWith('system.') || colName === 'dummypresets') {
+        continue;
+      }
+
+      if (colName === 'users') {
+        const result = await User.deleteMany({ _id: { $ne: req.user._id } });
+        deleted['users'] = result.deletedCount || 0;
+      } else {
+        const result = await db.collection(colName).deleteMany({});
+        deleted[colName] = result.deletedCount || 0;
+      }
+    }
+
+    const totalDeleted = Object.values(deleted).reduce((sum, count) => sum + count, 0);
+
+    res.json({
+      success: true,
+      message: `All site data wiped successfully (${totalDeleted} total records removed)`,
+      deleted,
+      totalDeleted
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message || 'Unable to clear all site data' });
+  }
+};
+
+const seedDummyData = async (req, res) => {
+  try {
+    let presetDoc = await DummyPreset.findOne({ key: 'default_erp_preset' });
+    if (!presetDoc) {
+      presetDoc = await DummyPreset.create({
+        key: 'default_erp_preset',
+        data: defaultPresetData
+      });
+    }
+
+    const seed = presetDoc.data || defaultPresetData;
+    const summary = {};
+
+    const adminUser = req.user || (await User.findOne({ role: 'Admin' })) || (await User.findOne());
+    const adminId = adminUser ? adminUser._id : new mongoose.Types.ObjectId();
+
+    // Create Categories
+    const categoryDocs = [];
+    for (const cat of seed.categories) {
+      let existing = await Category.findOne({ name: cat.name });
+      if (!existing) {
+        existing = await Category.create(cat);
+      }
+      categoryDocs.push(existing);
+    }
+    summary.categories = categoryDocs.length;
+
+    // Create Suppliers
+    const supplierDocs = [];
+    for (const sup of seed.suppliers) {
+      let existing = await Supplier.findOne({ name: sup.name });
+      if (!existing) {
+        existing = await Supplier.create(sup);
+      }
+      supplierDocs.push(existing);
+    }
+    summary.suppliers = supplierDocs.length;
+
+    // Create Products
+    const productDocs = [];
+    for (const prod of seed.products) {
+      const catId = categoryDocs[prod.categoryIndex]?._id || categoryDocs[0]._id;
+      const supId = supplierDocs[prod.supplierIndex]?._id || supplierDocs[0]._id;
+      
+      let existing = await Product.findOne({ name: prod.name });
+      if (!existing) {
+        existing = await Product.create({
+          name: prod.name,
+          description: prod.description,
+          category: catId,
+          supplier: supId,
+          purchasePrice: prod.purchasePrice,
+          sellingPrice: prod.sellingPrice,
+          inventoryQuantity: prod.inventoryQuantity,
+          storeQuantity: prod.storeQuantity,
+          minimumStock: prod.minimumStock,
+          unit: prod.unit,
+          image: prod.image,
+          isActive: true
+        });
+      } else {
+        existing.image = prod.image;
+        existing.inventoryQuantity = prod.inventoryQuantity;
+        existing.storeQuantity = prod.storeQuantity;
+        await existing.save();
+      }
+      productDocs.push(existing);
+    }
+    summary.products = productDocs.length;
+
+    // Create Purchase Order from Supplier 0
+    const purchaseItem1 = {
+      productId: productDocs[0]._id,
+      quantity: 50,
+      unitCost: productDocs[0].purchasePrice,
+      total: 50 * productDocs[0].purchasePrice
+    };
+    const purchaseItem2 = {
+      productId: productDocs[2]._id,
+      quantity: 30,
+      unitCost: productDocs[2].purchasePrice,
+      total: 30 * productDocs[2].purchasePrice
+    };
+    const totalPurchaseCost = purchaseItem1.total + purchaseItem2.total;
+
+    const purchaseDoc = await Purchase.create({
+      supplierId: supplierDocs[0]._id,
+      createdBy: adminId,
+      invoiceNumber: `PO-SEED-${Date.now().toString().slice(-4)}`,
+      items: [purchaseItem1, purchaseItem2],
+      totalAmount: totalPurchaseCost,
+      status: 'RECEIVED',
+      paymentStatus: 'PAID'
+    });
+    summary.purchases = 1;
+
+    // Create Supplier Payment
+    await SupplierPayment.create({
+      supplierId: supplierDocs[0]._id,
+      amount: totalPurchaseCost,
+      date: new Date(),
+      method: 'Bank Transfer',
+      reference: `TRX-${purchaseDoc.invoiceNumber}`,
+      createdBy: adminId
+    });
+    summary.supplierPayments = 1;
+
+    // Create Stock Movements (Purchase & Transfer)
+    for (const pItem of [purchaseItem1, purchaseItem2]) {
+      await StockMovement.create({
+        productId: pItem.productId,
+        type: 'PURCHASE',
+        quantity: pItem.quantity,
+        previousStock: 0,
+        newStock: pItem.quantity,
+        location: 'INVENTORY',
+        referenceType: 'Purchase',
+        referenceId: purchaseDoc._id,
+        createdBy: adminId,
+        reason: 'Supplier Stock Batch Arrival'
+      });
+
+      await StockMovement.create({
+        productId: pItem.productId,
+        type: 'TRANSFER',
+        quantity: 15,
+        previousStock: pItem.quantity,
+        newStock: pItem.quantity - 15,
+        fromLocation: 'INVENTORY',
+        toLocation: 'STORE',
+        referenceType: 'Transfer',
+        createdBy: adminId,
+        reason: 'Initial Store Shelf Allocation'
+      });
+    }
+    summary.stockMovements = 4;
+
+    // Create Customers
+    const customerDocs = [];
+    for (const cust of seed.customers) {
+      let existing = await Customer.findOne({ phone: cust.phone });
+      if (!existing) {
+        existing = await Customer.create(cust);
+      }
+      customerDocs.push(existing);
+    }
+    summary.customers = customerDocs.length;
+
+    // Create Submitted Cart for Customer 0
+    const cartDoc = await Cart.create({
+      customerId: customerDocs[0]._id,
+      items: [{
+        productId: productDocs[0]._id,
+        productName: productDocs[0].name,
+        quantity: 1,
+        unitPriceSnapshot: productDocs[0].sellingPrice
+      }],
+      status: 'submitted',
+      submittedAt: new Date(),
+      finalizedBy: adminId
+    });
+    summary.carts = 1;
+
+    // Create Sale 1 (POS Sale to Customer 0)
+    const sale1Item = {
+      productId: productDocs[0]._id,
+      productName: productDocs[0].name,
+      quantity: 1,
+      unitPrice: productDocs[0].sellingPrice,
+      purchaseCost: productDocs[0].purchasePrice,
+      total: productDocs[0].sellingPrice
+    };
+    const saleDoc1 = await Sale.create({
+      invoiceNumber: `INV-SEED-${Date.now().toString().slice(-4)}-1`,
+      customerId: customerDocs[0]._id,
+      cashierId: adminId,
+      cartId: cartDoc._id,
+      channel: 'pos',
+      items: [sale1Item],
+      subtotal: sale1Item.total,
+      total: sale1Item.total,
+      status: 'completed',
+      paymentStatus: 'paid'
+    });
+
+    await Payment.create({
+      amount: sale1Item.total,
+      method: 'cash',
+      referenceType: 'SALE',
+      referenceId: saleDoc1._id,
+      saleId: saleDoc1._id,
+      createdBy: adminId,
+      paidAt: new Date(),
+      status: 'succeeded'
+    });
+
+    await Income.create({
+      title: `Sale Payment ${saleDoc1.invoiceNumber}`,
+      source: 'POS Sale',
+      amount: sale1Item.total,
+      referenceType: 'sale',
+      referenceId: saleDoc1._id,
+      createdBy: adminId
+    });
+
+    // Create Sale 2 (Walk-in Customer)
+    const sale2Item = {
+      productId: productDocs[1]._id,
+      productName: productDocs[1].name,
+      quantity: 2,
+      unitPrice: productDocs[1].sellingPrice,
+      purchaseCost: productDocs[1].purchasePrice,
+      total: 2 * productDocs[1].sellingPrice
+    };
+    const saleDoc2 = await Sale.create({
+      invoiceNumber: `INV-SEED-${Date.now().toString().slice(-4)}-2`,
+      walkInCustomerName: 'Tariq Mehmood (Walk-in)',
+      walkInCustomerPhone: '+923001239876',
+      cashierId: adminId,
+      channel: 'pos',
+      items: [sale2Item],
+      subtotal: sale2Item.total,
+      total: sale2Item.total,
+      status: 'completed',
+      paymentStatus: 'paid'
+    });
+
+    await Payment.create({
+      amount: sale2Item.total,
+      method: 'cash',
+      referenceType: 'SALE',
+      referenceId: saleDoc2._id,
+      saleId: saleDoc2._id,
+      createdBy: adminId,
+      paidAt: new Date(),
+      status: 'succeeded'
+    });
+
+    await Income.create({
+      title: `Sale Payment ${saleDoc2.invoiceNumber}`,
+      source: 'POS Sale',
+      amount: sale2Item.total,
+      referenceType: 'sale',
+      referenceId: saleDoc2._id,
+      createdBy: adminId
+    });
+    summary.sales = 2;
+    summary.payments = 2;
+
+    // Create Manual Income
+    for (const inc of seed.manualIncome) {
+      await Income.create({
+        ...inc,
+        createdBy: adminId
+      });
+    }
+
+    // Create Expenses
+    for (const exp of seed.expenses) {
+      await Expense.create({
+        ...exp,
+        createdBy: adminId
+      });
+    }
+    summary.expenses = seed.expenses.length;
+
+    res.json({
+      success: true,
+      message: 'Dummy preset object fetched from MongoDB and sample data generated successfully across all modules!',
+      summary
+    });
+  } catch (error) {
+    console.error('Seed dummy data error:', error);
+    res.status(500).json({ success: false, message: error.message || 'Unable to seed dummy data' });
+  }
+};
+
+module.exports = { getSettingsSummary, clearModule, clearAll, seedDummyData };

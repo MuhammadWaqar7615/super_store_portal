@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { AlertTriangle, Database, ExternalLink, Package, RefreshCw, Settings as SettingsIcon, Trash2, UsersRound } from 'lucide-react';
+import { AlertTriangle, Database, ExternalLink, Package, RefreshCw, Settings as SettingsIcon, Sparkles, Trash2, UsersRound } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import api from '../services/api';
 import settingsService from '../services/settingsService';
@@ -79,6 +79,39 @@ const Settings = () => {
     }
   };
 
+  const clearAllData = async () => {
+    if (!window.confirm('CRITICAL WARNING: Are you sure you want to delete ALL data across the entire site?\n\nThis will permanently wipe all products, categories, suppliers, sales, purchases, finance records, stock movements, carts, customers, and staff users (except your active admin account).\n\nThis action CANNOT be undone!')) return;
+
+    try {
+      setBusyModule('all');
+      setError('');
+      const response = await settingsService.clearAll();
+      const deletedTotal = Object.values(response.deleted || {}).reduce((total, count) => total + count, 0);
+      setMessage(`${response.message} (${deletedTotal} record${deletedTotal === 1 ? '' : 's'} removed)`);
+      await loadData();
+    } catch (err) {
+      setError(err.response?.data?.message || 'Unable to delete all site data');
+    } finally {
+      setBusyModule('');
+    }
+  };
+
+  const handleSeedDummyData = async () => {
+    if (!window.confirm('Generate sample dummy data?\n\nThis will fetch the master preset object stored in MongoDB and populate sample suppliers, products with images, purchase orders, stock movements, customers, carts, sales, payments, and finance records across the site.')) return;
+
+    try {
+      setBusyModule('seed');
+      setError('');
+      const response = await settingsService.seedDummyData();
+      setMessage(response.message || 'Dummy sample data generated successfully!');
+      await loadData();
+    } catch (err) {
+      setError(err.response?.data?.message || 'Unable to seed dummy data');
+    } finally {
+      setBusyModule('');
+    }
+  };
+
   const deleteProduct = async (product) => {
     if (!window.confirm(`Delete product "${product.name}" from the catalog? This cannot be undone.`)) return;
     try {
@@ -132,7 +165,7 @@ const Settings = () => {
         </div>
       </section>
 
-      <section className="rounded-2xl bg-white/10 border border-red-500/20 overflow-hidden">
+      <section className="rounded-2xl bg-white/10 border border-red-500/20 overflow-hidden mb-8">
         <div className="p-5 border-b border-white/10"><h2 className="text-xl font-semibold flex items-center gap-2"><Database size={20} className="text-red-300" /> Clear Module Data</h2><p className="text-sm text-gray-400 mt-1">Use only when intentionally resetting a module or preparing a clean environment.</p></div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 p-5">
           {clearableModules.map(([module, label, description]) => {
@@ -141,6 +174,52 @@ const Settings = () => {
           })}
         </div>
       </section>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mt-8">
+        <section className="rounded-2xl bg-emerald-950/30 border border-emerald-500/40 p-6 flex flex-col justify-between gap-6">
+          <div className="flex items-start gap-4">
+            <div className="p-3 rounded-xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 shrink-0">
+              <Sparkles size={28} />
+            </div>
+            <div>
+              <h2 className="text-xl font-bold text-emerald-200">Seed Site Dummy Data</h2>
+              <p className="text-sm text-emerald-200/70 mt-1">
+                Fetch the master preset object stored in MongoDB and generate sample site data (suppliers, catalog products with dummy images, purchase orders, stock movements, customers, carts, sales, payments, and finance).
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={handleSeedDummyData}
+            disabled={busyModule !== ''}
+            className="w-full sm:w-auto shrink-0 self-end rounded-xl bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white px-6 py-3 font-semibold text-sm shadow-lg shadow-emerald-900/30 flex items-center justify-center gap-2 border border-emerald-400/30 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+          >
+            <Sparkles size={18} />
+            {busyModule === 'seed' ? 'Generating Dummy Data...' : 'Seed Dummy Data'}
+          </button>
+        </section>
+
+        <section className="rounded-2xl bg-red-950/40 border border-red-500/40 p-6 flex flex-col justify-between gap-6">
+          <div className="flex items-start gap-4">
+            <div className="p-3 rounded-xl bg-red-600/20 text-red-400 border border-red-500/30 shrink-0">
+              <AlertTriangle size={28} />
+            </div>
+            <div>
+              <h2 className="text-xl font-bold text-red-200">Delete All Site Data</h2>
+              <p className="text-sm text-red-200/70 mt-1">
+                Permanently delete all site settings, catalog products, sales, purchases, finance, stock movements, customers, carts, and staff accounts (preserving only your current admin login).
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={clearAllData}
+            disabled={busyModule !== ''}
+            className="w-full sm:w-auto shrink-0 self-end rounded-xl bg-red-600 hover:bg-red-700 active:bg-red-800 text-white px-6 py-3 font-semibold text-sm shadow-lg shadow-red-900/30 flex items-center justify-center gap-2 border border-red-400/30 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+          >
+            <Trash2 size={18} />
+            {busyModule === 'all' ? 'Deleting All Data...' : 'Delete All Data'}
+          </button>
+        </section>
+      </div>
     </div>
   );
 };
